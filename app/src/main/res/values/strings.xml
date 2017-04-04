@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">velocious</string>
-    <string name="btn_offline_transaction">Offline Transaction!</string>
-    <string name="btn_shopping_assist">Shopping Assist!</string>
+    <string name="btn_offline_transaction">Offline Transaction</string>
+    <string name="btn_shopping_assist">Shopping Assist</string>
 </resources>
