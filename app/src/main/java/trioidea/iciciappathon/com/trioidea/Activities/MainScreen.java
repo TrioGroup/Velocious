@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
+import trioidea.iciciappathon.com.trioidea.DbHelper;
 import trioidea.iciciappathon.com.trioidea.Fragments.FeatureOptionFragment;
 import trioidea.iciciappathon.com.trioidea.R;
 
@@ -16,7 +17,7 @@ public class MainScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_screen);
-
+        DbHelper dbHelper=DbHelper.getInstance(this);
     }
 
     public void startFeaturesOptionFragment()
