@@ -11,13 +11,14 @@ import java.net.URL;
 
 /**
  * Created by pritesh.gandhi on 6/7/16.
+ * Base web service
  */
 public class WebService {
     public static String getJSON(String url) {
         HttpURLConnection c = null;
         try {
 
-            Log.d("API",url);
+            Log.d("API", url);
             URL u = new URL(url);
             c = (HttpURLConnection) u.openConnection();
             c.setRequestMethod("GET");
@@ -29,18 +30,18 @@ public class WebService {
             c.connect();
             int status = c.getResponseCode();
 
-            switch (status) {
+            /*switch (status) {
                 case 200:
-                case 201:
-                    BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
-                    StringBuilder sb = new StringBuilder();
-                    String line;
-                    while ((line = br.readLine()) != null) {
-                        sb.append(line);
-                    }
-                    br.close();
-                    return sb.toString().replaceAll(" ","");//replace("[","").replace("]","");
+                case 201:*/
+            BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
             }
+            br.close();
+            return sb.toString().replaceAll(" ", "");//replace("[","").replace("]","");
+
 
         } catch (MalformedURLException ex) {
             return null;
@@ -55,6 +56,5 @@ public class WebService {
                 }
             }
         }
-        return null;
     }
 }
