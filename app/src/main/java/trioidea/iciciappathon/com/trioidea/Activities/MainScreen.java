@@ -1,5 +1,6 @@
 package trioidea.iciciappathon.com.trioidea.Activities;
 
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -30,6 +31,7 @@ public class MainScreen extends AppCompatActivity {
         android.app.FragmentManager fragmentManager= getFragmentManager();
         android.app.FragmentTransaction fragmentTransaction=fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.main_fragment, fragment);
+        fragmentTransaction.addToBackStack(fragment.getClass().getName());
         fragmentTransaction.commit();
     }
     public void addFragment(android.app.Fragment fragment)
@@ -38,5 +40,11 @@ public class MainScreen extends AppCompatActivity {
         android.app.FragmentTransaction fragmentTransaction=fragmentManager.beginTransaction();
         fragmentTransaction.add(R.id.main_fragment, fragment);
         fragmentTransaction.commit();
+    }
+    public void startActivityTransferOffline()
+    {
+        Intent intent=new Intent(this,TransferActivity.class);
+        startActivity(intent);
+        this.finish();
     }
 }

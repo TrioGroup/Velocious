@@ -1,5 +1,6 @@
 package trioidea.iciciappathon.com.trioidea.Services;
 
+import android.content.Intent;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -16,10 +17,13 @@ import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
 import rx.schedulers.Schedulers;
+import rx.subjects.BehaviorSubject;
 import trioidea.iciciappathon.com.trioidea.DTO.AllUsersInfoDTO;
 import trioidea.iciciappathon.com.trioidea.DTO.AuthenticateDto;
 import trioidea.iciciappathon.com.trioidea.DTO.BalanceEnquiryDTO;
 import trioidea.iciciappathon.com.trioidea.DTO.BankAccountSummaryDTO;
+import trioidea.iciciappathon.com.trioidea.DTO.FundTransferDto;
+import trioidea.iciciappathon.com.trioidea.DTO.TransactionDto;
 import trioidea.iciciappathon.com.trioidea.EventNumbers;
 import trioidea.iciciappathon.com.trioidea.EventResponse;
 import trioidea.iciciappathon.com.trioidea.RxBus;
@@ -31,6 +35,8 @@ public class ServiceLayer implements Observer {
     private static ServiceLayer serviceLayer;
     private static String tokenId = null;
     RxBus rxBus = RxBus.getInstance();
+    int i;
+    private TransactionDto[] transactionDto;
     private String client_id = "sandeshbankar24@gmail.com";
     private String pwd = "LP549V52";
 
@@ -44,7 +50,7 @@ public class ServiceLayer implements Observer {
     }
 
     public void autheticateUser() {
-        if (tokenId == null) {
+        if (tokenId == null || tokenId.isEmpty()) {
             Observable observable = Observable.fromCallable(new Callable() {
                 @Override
                 public Object call() throws Exception {
@@ -57,7 +63,7 @@ public class ServiceLayer implements Observer {
                     }
                 }
             });
-            observable.subscribeOn(Schedulers.io()).observeOn(Schedulers.computation()).subscribe(ServiceLayer.this);
+            observable.subscribeOn(Schedulers.io()).observeOn(Schedulers.computation()).toBlocking().subscribe(ServiceLayer.this);
         } else {
             //Event notify
         }
@@ -114,6 +120,31 @@ public class ServiceLayer implements Observer {
         observable.subscribeOn(Schedulers.io()).observeOn(Schedulers.computation()).subscribe(ServiceLayer.this);
     }
 
+    public void fundTransfer(final TransactionDto[] transactionDtoArrayList) {
+        this.transactionDto = transactionDtoArrayList;
+            Observable observable = Observable.fromCallable(new Callable() {
+                @Override
+                public Object call() throws Exception {
+                    try {
+                        FundTransferWS fundTransferWS = new FundTransferWS();
+                        EventResponse eventResponse = fundTransferWS.fundTransfer(client_id,tokenId,transactionDtoArrayList);
+                        if (!((FundTransferDto) eventResponse.getResponse()).getStatus().equalsIgnoreCase("success")) {
+                            transactionDtoArrayList[i].setSyncFlag(true);
+                        }
+                        else
+                        {
+                            transactionDtoArrayList[i].setSyncFlag(false);
+                        }
+                        eventResponse.setResponse(transactionDtoArrayList[i]);
+                        return eventResponse;
+                    } catch (Exception e) {
+                        return e;
+                    }
+                }
+            });
+            observable.subscribeOn(Schedulers.io()).observeOn(Schedulers.computation()).subscribe(ServiceLayer.this);
+    }
+
 
     @Override
     public void onCompleted() {
@@ -131,6 +162,7 @@ public class ServiceLayer implements Observer {
         switch (((EventResponse) o).getEvent()) {
             case EventNumbers.AUTHENTICATE_USER:
                 AuthenticateDto authenticateDtoArrayList = (AuthenticateDto) ((EventResponse) o).getResponse();
+                tokenId=authenticateDtoArrayList.getToken();
                 Log.e("Event Authenticate user", authenticateDtoArrayList.getToken());
                 ((EventResponse) o).setEvent(EventNumbers.AUTHENTICATE_USER);
                 rxBus.send((EventResponse) o);
@@ -153,7 +185,18 @@ public class ServiceLayer implements Observer {
                 ((EventResponse) o).setEvent(EventNumbers.ACCOUNT_SUMMARY);
                 rxBus.send((EventResponse) o);
                 break;
-
+            case EventNumbers.FUND_TRANSFER:
+                FundTransferDto fundTransferDto;
+                TransactionDto transactionDto;
+                if ((((EventResponse) o).getResponse()).getClass().getName().equalsIgnoreCase("FundTransferDTO")) {
+                    fundTransferDto = (FundTransferDto) ((EventResponse) o).getResponse();
+                } else {
+                    transactionDto = (TransactionDto) ((EventResponse) o).getResponse();
+                }
+                Log.e("Event fund transfer", "here");
+                ((EventResponse) o).setEvent(EventNumbers.FUND_TRANSFER);
+                rxBus.send((EventResponse) o);
+                break;
         }
     }
 }

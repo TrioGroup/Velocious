@@ -14,6 +14,8 @@ public class TransactionDto  {
     double balance;
     boolean syncFlag;
 
+    public TransactionDto()
+    {    }
     public TransactionDto(int transactionId, int senderID, String senderName, int receiverId, String receiverName, double amount, String time, double balance, boolean syncFlag) {
         this.transactionId = transactionId;
         this.senderID = senderID;

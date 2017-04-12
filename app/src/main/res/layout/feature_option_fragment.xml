@@ -10,12 +10,29 @@
         android:id="@+id/btn_offline_transaction"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/btn_offline_transaction"/>
+        android:text="@string/btn_offline_transaction" />
 
-    <Button
-        android:id="@+id/btn_shopping_assist"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/standard_margin"
-        android:text="@string/btn_shopping_assist"/>
+        android:layout_height="wrap_content">
+
+        <ImageButton
+            android:id="@+id/btn_shopping_assist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/standard_margin"
+            android:layout_marginTop="@dimen/standard_margin"
+            android:background="@android:color/transparent"
+            android:src="@drawable/shopping" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_shopping_assist"
+            android:layout_toRightOf="@id/btn_shopping_assist"
+            android:layout_centerVertical="true"
+            android:textSize="16sp"
+            android:fontFamily=""
+            />
+    </RelativeLayout>
 </LinearLayout>

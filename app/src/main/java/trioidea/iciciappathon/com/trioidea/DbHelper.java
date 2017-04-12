@@ -118,4 +118,30 @@ public class DbHelper extends SQLiteOpenHelper {
             return transactionDtos;
         }
     }
+
+    public TransactionDto[] getNotSyncedTransaction()
+    {
+        TransactionDto[] transactionDtos=null;
+        TransactionDto[] transactionDtosToPass=null;
+        transactionDtos=getAllTransaction();
+        if(transactionDtos!=null) {
+            transactionDtosToPass = new TransactionDto[transactionDtos.length];
+            int j = 0;
+            for (int i = 0; i < transactionDtos.length; i++) {
+                if (!transactionDtos[i].isSyncFlag()) {
+                    transactionDtosToPass[j] = transactionDtos[i];
+                    j++;
+                }
+            }
+        }
+        return transactionDtosToPass;
+    }
+    public void markSynced(TransactionDto transactionDto)
+    {
+        //String selectQuery = "UPDATE transactions SET sync_flag=\""+transactionDto.isSyncFlag()+"\" WHERE t_id=\""+transactionDto.getTransactionId()+"\";";
+        ContentValues values = new ContentValues();
+        values.put("sync_flag", EncryptionClass.symmetricEncrypt(String.valueOf(transactionDto.isSyncFlag())).trim());
+        db.update("transactions",values,"WHERE t_id=\'"+transactionDto.getTransactionId()+"\'",null);
+
+    }
 }
