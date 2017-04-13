@@ -141,8 +141,6 @@ public class FeatureOptionFragmentController implements Observer, View.OnClickLi
                 }
                 Date now=new Date(System.currentTimeMillis());
                 Log.e("Time ",now.toString());
-                RegistrationFragment registrationFragment=new RegistrationFragment();
-                ((MainScreen)featureOptionFragment.getActivity()).replaceFragment(registrationFragment);
                 break;
         }
     }

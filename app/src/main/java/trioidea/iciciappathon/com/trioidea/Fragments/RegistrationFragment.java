@@ -1,21 +1,35 @@
 package trioidea.iciciappathon.com.trioidea.Fragments;
 
 import android.app.Fragment;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 
+import trioidea.iciciappathon.com.trioidea.EncryptionClass;
 import trioidea.iciciappathon.com.trioidea.FragmentControllers.FeatureOptionFragmentController;
+import trioidea.iciciappathon.com.trioidea.FragmentControllers.RegistrationFragmentController;
 import trioidea.iciciappathon.com.trioidea.R;
+
+import android.support.design.widget.TextInputLayout;
 
 /**
  * Created by asus on 13/04/2017.
  */
 public class RegistrationFragment extends Fragment {
+
+    EditText etName, etAddress, etPhoneNumber, etAadhar, etCard;
+    TextInputLayout tilName, tilAddress, tilPhoneNumber, tilAadhar, tilCard;
+    ImageButton register;
+    RegistrationFragmentController registrationFragmentController;
 
     @Nullable
     @Override
@@ -26,13 +40,118 @@ public class RegistrationFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        registrationFragmentController = new RegistrationFragmentController(this);
         init();
+        resetUi();
     }
-    public void init()
+
+    public void init() {
+        etName = (EditText) RegistrationFragment.this.getActivity().findViewById(R.id.et_name);
+        //etName.addTextChangedListener(this);
+        etAddress = (EditText) RegistrationFragment.this.getActivity().findViewById(R.id.et_address);
+        etPhoneNumber = (EditText) RegistrationFragment.this.getActivity().findViewById(R.id.et_phone);
+        etAadhar = (EditText) RegistrationFragment.this.getActivity().findViewById(R.id.et_aadhar);
+        etCard = (EditText) RegistrationFragment.this.getActivity().findViewById(R.id.et_card);
+        register = (ImageButton) RegistrationFragment.this.getActivity().findViewById(R.id.btn_register);
+        register.setOnClickListener(registrationFragmentController);
+        tilName = (TextInputLayout) RegistrationFragment.this.getActivity().findViewById(R.id.til_name);
+        tilAddress = (TextInputLayout) RegistrationFragment.this.getActivity().findViewById(R.id.til_address);
+        tilPhoneNumber = (TextInputLayout) RegistrationFragment.this.getActivity().findViewById(R.id.til_phone);
+        tilAadhar = (TextInputLayout) RegistrationFragment.this.getActivity().findViewById(R.id.til_aadhar);
+        tilCard = (TextInputLayout) RegistrationFragment.this.getActivity().findViewById(R.id.til_card);
+        addTextWatcher(tilName);
+        addTextWatcher(tilAddress);
+        addTextWatcher(tilPhoneNumber);
+        addTextWatcher(tilAadhar);
+        addTextWatcher(tilCard);
+
+    }
+
+    public boolean validateData() {
+        boolean flag = true;
+        if (etName.getText().toString().isEmpty()) {
+            tilName.setError("Name is a required field.");
+            tilName.setErrorEnabled(true);
+            flag = false;
+        }
+        if (etAddress.getText().toString().isEmpty()) {
+            tilAddress.setError("Address is a required field.");
+            tilAddress.setErrorEnabled(true);
+        }
+        if (etPhoneNumber.getText().toString().isEmpty()) {
+            tilPhoneNumber.setError("Phone Number is a required field.");
+            tilPhoneNumber.setErrorEnabled(true);
+            flag = false;
+        }
+        if (etPhoneNumber.getText().toString().length() < 10) {
+            tilPhoneNumber.setError("Phone Number invalid.");
+            tilPhoneNumber.setErrorEnabled(true);
+            flag = false;
+        }
+        if (etAadhar.getText().toString().isEmpty()) {
+            tilAadhar.setError("Aadhar card number is a required field.");
+            tilAadhar.setErrorEnabled(true);
+            flag=false;
+        }
+        if(etAadhar.getText().length() < 12)
+        {
+            tilAadhar.setError("Aadhar card number is invalid.");
+            tilAadhar.setErrorEnabled(true);
+            flag=false;
+        }
+        if(etCard.getText().toString().isEmpty())
+        {
+            tilCard.setError("Card Number is a required field.");
+            tilCard.setErrorEnabled(true);
+            flag=false;
+        }
+        if(etCard.getText().length()<16)
+        {
+            tilCard.setError("Card Number is invalid.");
+            tilCard.setErrorEnabled(true);
+            flag=false;
+        }
+        return flag;
+    }
+
+    public void resetUi()
     {
-
+        tilName.setErrorEnabled(false);
+        tilPhoneNumber.setErrorEnabled(false);
+        tilAddress.setErrorEnabled(false);
+        tilAadhar.setErrorEnabled(false);
+        tilCard.setErrorEnabled(false);
     }
+    public void setDataInSharedPref()
+    {
+        SharedPreferences.Editor editor = this.getActivity().getSharedPreferences("userData", Context.MODE_PRIVATE).edit();
+        editor.putString("name", EncryptionClass.symmetricEncrypt(etName.getText().toString()));
+        editor.putString("address",EncryptionClass.symmetricEncrypt(etAddress.getText().toString()));
+        editor.putString("phone",EncryptionClass.symmetricEncrypt(etPhoneNumber.getText().toString()));
+        editor.putString("aadhar",EncryptionClass.symmetricEncrypt(etAadhar.getText().toString()));
+        editor.putString("card",EncryptionClass.symmetricEncrypt(etCard.getText().toString()));
+        editor.putBoolean("registered",true);
+        editor.commit();
+    }
+    private void addTextWatcher(final TextInputLayout textInputLayout)
+    {
+        textInputLayout.getEditText().addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                textInputLayout.setErrorEnabled(false);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+    }
 }
 
 
