@@ -5,10 +5,10 @@
     android:layout_height="match_parent"
     tools:context=".Activities.MainScreen">
 
-   <fragment
-       class="trioidea.iciciappathon.com.trioidea.Fragments.FeatureOptionFragment"
+   <LinearLayout
        android:id="@+id/main_fragment"
        android:layout_width="match_parent"
        android:layout_height="match_parent"
+       android:orientation="vertical"
        />
 </RelativeLayout>

@@ -40,7 +40,7 @@ public class WebService {
                 sb.append(line);
             }
             br.close();
-            return sb.toString().replaceAll(" ", "");//replace("[","").replace("]","");
+            return sb.toString().replaceAll(" ", "");//.replace("[","").replace("]","");
 
 
         } catch (MalformedURLException ex) {

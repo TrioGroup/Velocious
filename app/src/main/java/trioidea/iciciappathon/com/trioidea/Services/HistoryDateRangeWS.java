@@ -8,20 +8,21 @@ import com.google.gson.reflect.TypeToken;
 import org.json.JSONArray;
 
 import java.lang.reflect.Type;
+import java.sql.Date;
 import java.util.ArrayList;
 
-import trioidea.iciciappathon.com.trioidea.DTO.AuthenticateDto;
 import trioidea.iciciappathon.com.trioidea.DTO.BankAccountSummaryDTO;
+import trioidea.iciciappathon.com.trioidea.DTO.HistoryDateRangeDTO;
 import trioidea.iciciappathon.com.trioidea.EventNumbers;
 import trioidea.iciciappathon.com.trioidea.EventResponse;
 
 /**
- * Created by asus on 11/04/2017.
+ * Created by asus on 13/04/2017.
  */
-public class AccountSummaryWS {
-    public EventResponse getAccountSummary(String userName, String token, long custId,long accountNumber) {
+public class HistoryDateRangeWS {
+    public EventResponse getHistory(String userName, String token, long accountNumber, java.util.Date fromDate, java.util.Date toDate) {
 
-        String response = WebService.getJSON("https://retailbanking.mybluemix.net/banking/icicibank/account_summary?client_id="+userName+"&token="+token+"&custid="+custId+"&accountno="+accountNumber);
+        String response = WebService.getJSON("https://retailbanking.mybluemix.net/banking/icicibank/transactioninterval?client_id="+userName+"&accountno="+accountNumber+"&fromdate="+fromDate+"&todate="+toDate);
         Gson gson = new Gson();
         try {
             JSONArray jsonArray = new JSONArray(response);
@@ -29,11 +30,11 @@ public class AccountSummaryWS {
                     }.getType();
                     ArrayList<PostsDto> postsDto = gson.fromJson(jsonArray.toString(), type);
                     return postsDto;*/
-            Type type = new TypeToken<ArrayList<BankAccountSummaryDTO>>() {
+            Type type = new TypeToken<ArrayList<HistoryDateRangeDTO>>() {
             }.getType();
             Log.e("BankAccountSummary",jsonArray.toString());
-            ArrayList<BankAccountSummaryDTO> bankAccountSummaryDTO = gson.fromJson(jsonArray.toString(), type);
-            EventResponse eventResponse=new EventResponse((Object)bankAccountSummaryDTO, EventNumbers.ACCOUNT_SUMMARY);
+            ArrayList<HistoryDateRangeDTO> historyDateRangeDTOs = gson.fromJson(jsonArray.toString(), type);
+            EventResponse eventResponse=new EventResponse((Object)historyDateRangeDTOs, EventNumbers.HISTORY_DATE_RANGE);
             return eventResponse;
         } catch (Exception e) {
             return null;

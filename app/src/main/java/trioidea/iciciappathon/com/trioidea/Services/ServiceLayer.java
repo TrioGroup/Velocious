@@ -1,6 +1,7 @@
 package trioidea.iciciappathon.com.trioidea.Services;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -10,6 +11,7 @@ import org.json.JSONArray;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -23,6 +25,7 @@ import trioidea.iciciappathon.com.trioidea.DTO.AuthenticateDto;
 import trioidea.iciciappathon.com.trioidea.DTO.BalanceEnquiryDTO;
 import trioidea.iciciappathon.com.trioidea.DTO.BankAccountSummaryDTO;
 import trioidea.iciciappathon.com.trioidea.DTO.FundTransferDto;
+import trioidea.iciciappathon.com.trioidea.DTO.HistoryDateRangeDTO;
 import trioidea.iciciappathon.com.trioidea.DTO.TransactionDto;
 import trioidea.iciciappathon.com.trioidea.EventNumbers;
 import trioidea.iciciappathon.com.trioidea.EventResponse;
@@ -145,6 +148,22 @@ public class ServiceLayer implements Observer {
             observable.subscribeOn(Schedulers.io()).observeOn(Schedulers.computation()).subscribe(ServiceLayer.this);
     }
 
+    public void historyByDate(final AllUsersInfoDTO allUsersInfoDTO, final Date fromDate, final Date toDate) {
+        Observable observable = Observable.fromCallable(new Callable() {
+            @Override
+            public Object call() throws Exception {
+                try {
+                    HistoryDateRangeWS historyDateRangeWS=new HistoryDateRangeWS();
+                    EventResponse eventResponse = historyDateRangeWS.getHistory(client_id,tokenId,allUsersInfoDTO.getAccount_no(),fromDate,toDate);
+                    return eventResponse;
+                } catch (Exception e) {
+                    return e;
+                }
+            }
+        });
+        observable.subscribeOn(Schedulers.io()).observeOn(Schedulers.computation()).subscribe(ServiceLayer.this);
+    }
+
 
     @Override
     public void onCompleted() {
@@ -161,9 +180,9 @@ public class ServiceLayer implements Observer {
         EventResponse eventResponse = (EventResponse) o;
         switch (((EventResponse) o).getEvent()) {
             case EventNumbers.AUTHENTICATE_USER:
-                AuthenticateDto authenticateDtoArrayList = (AuthenticateDto) ((EventResponse) o).getResponse();
-                tokenId=authenticateDtoArrayList.getToken();
-                Log.e("Event Authenticate user", authenticateDtoArrayList.getToken());
+                ArrayList<AuthenticateDto> authenticateDtoArrayList = (ArrayList<AuthenticateDto>) ((EventResponse) o).getResponse();
+                tokenId=authenticateDtoArrayList.get(0).getToken();
+                Log.e("Event Authenticate user", tokenId);
                 ((EventResponse) o).setEvent(EventNumbers.AUTHENTICATE_USER);
                 rxBus.send((EventResponse) o);
                 break;
@@ -174,14 +193,14 @@ public class ServiceLayer implements Observer {
                 rxBus.send((EventResponse) o);
                 break;
             case EventNumbers.BALANCE_ENQUIRY:
-                BalanceEnquiryDTO balanceEnquiryDTOArrayList = (BalanceEnquiryDTO) ((EventResponse) o).getResponse();
-                Log.e("Event balance enquiry", "" + balanceEnquiryDTOArrayList.getBalance());
+                ArrayList<BalanceEnquiryDTO> balanceEnquiryDTOArrayList = (ArrayList<BalanceEnquiryDTO>) ((EventResponse) o).getResponse();
+                Log.e("Event balance enquiry", "" + balanceEnquiryDTOArrayList.get(0).getBalance());
                 ((EventResponse) o).setEvent(EventNumbers.BALANCE_ENQUIRY);
                 rxBus.send((EventResponse) o);
                 break;
             case EventNumbers.ACCOUNT_SUMMARY:
-                BankAccountSummaryDTO bankAccountSummaryDTO = (BankAccountSummaryDTO) ((EventResponse) o).getResponse();
-                Log.e("Event account summary", "" + bankAccountSummaryDTO.getAccountno());
+                ArrayList<BankAccountSummaryDTO> bankAccountSummaryDTO = (ArrayList<BankAccountSummaryDTO>) ((EventResponse) o).getResponse();
+                Log.e("Event account summary", "" + bankAccountSummaryDTO.get(0).getAccountno());
                 ((EventResponse) o).setEvent(EventNumbers.ACCOUNT_SUMMARY);
                 rxBus.send((EventResponse) o);
                 break;
@@ -195,6 +214,12 @@ public class ServiceLayer implements Observer {
                 }
                 Log.e("Event fund transfer", "here");
                 ((EventResponse) o).setEvent(EventNumbers.FUND_TRANSFER);
+                rxBus.send((EventResponse) o);
+                break;
+            case EventNumbers.HISTORY_DATE_RANGE:
+                ArrayList<HistoryDateRangeDTO> historyDateRangeDTOs = (ArrayList<HistoryDateRangeDTO>) ((EventResponse) o).getResponse();
+                Log.e("Event account summary", "" + historyDateRangeDTOs.get(0).getAccountno());
+                ((EventResponse) o).setEvent(EventNumbers.HISTORY_DATE_RANGE);
                 rxBus.send((EventResponse) o);
                 break;
         }

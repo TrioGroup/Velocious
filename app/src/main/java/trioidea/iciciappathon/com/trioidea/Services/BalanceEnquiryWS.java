@@ -1,6 +1,7 @@
 package trioidea.iciciappathon.com.trioidea.Services;
 
 import android.util.Log;
+import android.widget.ArrayAdapter;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -29,10 +30,10 @@ public class BalanceEnquiryWS {
                     }.getType();
                     ArrayList<PostsDto> postsDto = gson.fromJson(jsonArray.toString(), type);
                     return postsDto;*/
-            Type type = new TypeToken<BalanceEnquiryDTO>() {
+            Type type = new TypeToken<ArrayList<BalanceEnquiryDTO>>() {
             }.getType();
             Log.e("Balance enquiry",jsonArray.toString());
-            BalanceEnquiryDTO balanceEnquiryDTOArrayList = gson.fromJson(jsonArray.toString(), type);
+            ArrayList<BalanceEnquiryDTO> balanceEnquiryDTOArrayList = gson.fromJson(jsonArray.toString(), type);
             EventResponse eventResponse = new EventResponse((Object)balanceEnquiryDTOArrayList, EventNumbers.BALANCE_ENQUIRY);
             return eventResponse;
         } catch (Exception e) {

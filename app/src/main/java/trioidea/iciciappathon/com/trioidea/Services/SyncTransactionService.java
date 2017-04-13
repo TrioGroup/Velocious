@@ -8,6 +8,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.SystemClock;
@@ -83,16 +84,36 @@ public class SyncTransactionService extends Service implements Observer {
                 }
             });
             observable.subscribeOn(Schedulers.io()).observeOn(Schedulers.computation()).subscribe(this);*/
-            TransactionDto[] transactionDtos = null;
-            transactionDtos = DbHelper.getInstance(getApplicationContext()).getNotSyncedTransaction();
+
             // ArrayList<TransactionDto> transactionDto=(ArrayList<TransactionDto>)intent.getSerializableExtra("transactionDTO");
-            if (transactionDtos!=null && transactionDtos.length > 0) {
-                ServiceLayer serviceLayer = ServiceLayer.getServiceLayer();
-                serviceLayer.autheticateUser();
-                serviceLayer.fundTransfer(transactionDtos);
+            SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("userData", MODE_PRIVATE);
+            String tokenId = sharedPreferences.getString("tokenId", null);
+            if (tokenId.isEmpty() || tokenId == null) {
+                Observable observable = Observable.fromCallable(new Callable() {
+                    @Override
+                    public Object call() throws Exception {
+                        try {
+                            AuthenticateClient authenticateClient = new AuthenticateClient();
+                            EventResponse eventResponse = authenticateClient.authenticateClientWB("sandeshbankar24@gmail.com", "LP549V52");
+                            return eventResponse;
+                        } catch (Exception e) {
+                            return e;
+                        }
+                    }
+                });
+                observable.subscribeOn(Schedulers.io()).observeOn(Schedulers.computation()).subscribe(SyncTransactionService.this);
                 // serviceLayer.f
             }
-
+            else
+            {
+                TransactionDto[] transactionDtos = null;
+                transactionDtos = DbHelper.getInstance(getApplicationContext()).getNotSyncedTransaction();
+                SharedPreferences.Editor editor = getApplicationContext().getSharedPreferences("userData", Context.MODE_PRIVATE).edit();
+                editor.putString("tokenId",tokenId);
+                editor.commit();
+                checkHistoryToSync(transactionDtos);
+                ServiceLayer.getServiceLayer().fundTransfer(transactionDtos);
+            }
         }
         return START_STICKY;
     }
@@ -113,6 +134,11 @@ public class SyncTransactionService extends Service implements Observer {
 
     }
 
+    public void checkHistoryToSync(TransactionDto[] transactionDtos)
+    {
+
+
+    }
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         Intent restartServiceTask = new Intent(getApplicationContext(), this.getClass());
@@ -163,16 +189,22 @@ public class SyncTransactionService extends Service implements Observer {
                 } else {
                     transactionDto = (TransactionDto) ((EventResponse) o).getResponse();
                     DbHelper.getInstance(getApplicationContext()).markSynced(transactionDto);
-                    TransactionDto[] transactionDtos1=DbHelper.getInstance(getApplicationContext()).getAllTransaction();
-                    Log.e("Service fund transfer",""+transactionDtos1[0].isSyncFlag());
+                    TransactionDto[] transactionDtos1 = DbHelper.getInstance(getApplicationContext()).getAllTransaction();
+                    Log.e("Service fund transfer", "" + transactionDtos1[0].isSyncFlag());
                 }
                 Log.e("Event fund transfer", "here");
                 break;
             case EventNumbers.AUTHENTICATE_USER:
-                AuthenticateDto authenticateDtoArrayList = (AuthenticateDto) ((EventResponse) o).getResponse();
-                Log.e("Event Authenticate user", authenticateDtoArrayList.getToken());
+                ArrayList<AuthenticateDto> authenticateDtoArrayList = (ArrayList<AuthenticateDto>) ((EventResponse) o).getResponse();
+                Log.e("Event Authenticate user", authenticateDtoArrayList.get(0).getToken());
                 ((EventResponse) o).setEvent(EventNumbers.AUTHENTICATE_USER);
-                rxBus.send((EventResponse) o);
+                TransactionDto[] transactionDtos = null;
+                transactionDtos = DbHelper.getInstance(getApplicationContext()).getNotSyncedTransaction();
+                SharedPreferences.Editor editor = getApplicationContext().getSharedPreferences("userData", Context.MODE_PRIVATE).edit();
+                editor.putString("tokenId",authenticateDtoArrayList.get(0).getToken());
+                editor.commit();
+                checkHistoryToSync(transactionDtos);
+                ServiceLayer.getServiceLayer().fundTransfer(transactionDtos);
                 break;
         }
     }

@@ -6,8 +6,10 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.concurrent.Callable;
 
 import rx.Observable;
@@ -25,15 +27,15 @@ public class AuthenticateClient {
         String response = WebService.getJSON("https://corporateapiprojectwar.mybluemix.net/corporate_banking/mybank/authenticate_client?client_id="+userName+"&password="+password);
         Gson gson = new Gson();
         try {
-            JSONArray jsonArray = new JSONArray(response);
+            JSONArray jsonObject = new JSONArray(response);
                    /* Type type = new TypeToken<List<PostsDto>>() {
                     }.getType();
                     ArrayList<PostsDto> postsDto = gson.fromJson(jsonArray.toString(), type);
                     return postsDto;*/
-            Type type = new TypeToken<AuthenticateDto>() {
+            Type type = new TypeToken<ArrayList<AuthenticateDto>>() {
             }.getType();
-            Log.e("AllUser",jsonArray.toString());
-            AuthenticateDto authenticateDto = gson.fromJson(jsonArray.toString(), type);
+            Log.e("AllUser",jsonObject.toString());
+            ArrayList<AuthenticateDto> authenticateDto = gson.fromJson(jsonObject.toString(), type);
             EventResponse eventResponse=new EventResponse((Object)authenticateDto, EventNumbers.AUTHENTICATE_USER);
             return eventResponse;
         } catch (Exception e) {

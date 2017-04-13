@@ -1,6 +1,7 @@
 package trioidea.iciciappathon.com.trioidea.Services;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,13 +15,18 @@ import android.util.Log;
 import java.util.Collection;
 import java.util.Iterator;
 
+import rx.Observer;
 import trioidea.iciciappathon.com.trioidea.Activities.TransferActivity;
+import trioidea.iciciappathon.com.trioidea.EventNumbers;
+import trioidea.iciciappathon.com.trioidea.EventResponse;
+import trioidea.iciciappathon.com.trioidea.RxBus;
 
 /**
  * Created by Harshal on 05-Apr-17.
  */
 public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 
+    ProgressDialog progressDialog;
     private WifiP2pManager mManager;
     private WifiP2pManager.Channel mChannel;
     private TransferActivity mActivity;
@@ -67,6 +73,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                                     if (info != null) {
                                         Log.e("p2p","Connection information:---" + info.groupOwnerAddress);
                                         mActivity.address = info.groupOwnerAddress;
+                                        new FileClientAsyncTask(mActivity.getApplicationContext(), mActivity.address, mActivity.amount.getText().toString(), mActivity).execute();
                                     }
                                 }
                             }
@@ -104,5 +111,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             }
         }
     };
+
+
 }
 

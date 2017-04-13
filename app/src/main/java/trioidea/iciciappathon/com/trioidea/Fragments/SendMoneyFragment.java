@@ -1,6 +1,7 @@
 package trioidea.iciciappathon.com.trioidea.Fragments;
 
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pManager;
@@ -16,24 +17,30 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import rx.Observer;
 import trioidea.iciciappathon.com.trioidea.Activities.TransferActivity;
+import trioidea.iciciappathon.com.trioidea.EventNumbers;
+import trioidea.iciciappathon.com.trioidea.EventResponse;
 import trioidea.iciciappathon.com.trioidea.R;
+import trioidea.iciciappathon.com.trioidea.RxBus;
 import trioidea.iciciappathon.com.trioidea.Services.FileClientAsyncTask;
 import trioidea.iciciappathon.com.trioidea.Services.WiFiDirectBroadcastReceiver;
 
 /**
  * Created by Harshal on 12-Apr-17.
  */
-public class SendMoneyFragment extends Fragment
+public class SendMoneyFragment extends Fragment implements Observer
 {
 
+    ProgressDialog progressDialog;
     TransferActivity parentActivity;
-
+    RxBus rxBus=RxBus.getInstance();
 
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle savedInstanceState)
     {
         return layoutInflater.inflate(R.layout.send_money,viewGroup,false);
+
     }
 
     public void initUi()
@@ -49,30 +56,49 @@ public class SendMoneyFragment extends Fragment
         parentActivity.listView.setAdapter(parentActivity.adapter);
 
         parentActivity.amount = (EditText) parentActivity.findViewById(R.id.amount);
-        parentActivity.amount.clearFocus();
+        parentActivity.amount.setText(null);
 
         parentActivity.listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                progressDialog=new ProgressDialog(parentActivity);
+                progressDialog.setMessage("Sending money");
+                progressDialog.setProgress(0);
+                progressDialog.setCancelable(false);
+                progressDialog.show();
+                parentActivity.mWifiP2pManager.cancelConnect(parentActivity.mChannel, new WifiP2pManager.ActionListener() {
+                    @Override
+                    public void onSuccess() { Log.e("p2p","searching cancelled"); }
+
+                    @Override
+                    public void onFailure(int reason) { Log.e("p2p","searching cancelled"); }
+                });
                 final String item = ((TextView) view).getText().toString();
-                Toast.makeText(getActivity().getApplicationContext(), item, Toast.LENGTH_LONG).show();
+//                Toast.makeText(getActivity().getApplicationContext(), item, Toast.LENGTH_LONG).show();
                 WifiP2pConfig config = new WifiP2pConfig();
                 config.deviceAddress = item;
                 config.wps.setup = WpsInfo.PBC;
                 config.groupOwnerIntent = 0;
-                parentActivity.mWifiP2pManager.connect(parentActivity.mChannel, config, new WifiP2pManager.ActionListener() {
-                    @Override
-                    public void onSuccess() {
-                        Log.e("p2p", "connected to device");
-                        new FileClientAsyncTask(getActivity().getApplicationContext(), parentActivity.address, parentActivity.amount.getText().toString(), parentActivity).execute();
-                    }
+                Log.e("p2p","TextView value: "+parentActivity.amount.getText());
+                if(parentActivity.amount.getText() == null)
+                    Toast.makeText(getActivity().getApplicationContext(), "Please enter amount", Toast.LENGTH_LONG).show();
+                else
+                {
+                    parentActivity.mWifiP2pManager.connect(parentActivity.mChannel, config, new WifiP2pManager.ActionListener()
+                    {
+                        @Override
+                        public void onSuccess() {
+                            Log.e("p2p", "connected to device");
+                           // new FileClientAsyncTask(getActivity().getApplicationContext(), parentActivity.address, parentActivity.amount.getText().toString(), parentActivity).execute();
+                        }
 
-                    @Override
+                        @Override
 
-                    public void onFailure(int reason) {
-                        Log.e("p2p", "couldn't connect to device.. reason:" + reason);
-                    }
-                });
+                        public void onFailure(int reason) {
+                            Log.e("p2p", "couldn't connect to device.. reason:" + reason);
+                        }
+                    });
+                }
             }
         });
         parentActivity.adapter.notifyDataSetChanged();
@@ -87,6 +113,8 @@ public class SendMoneyFragment extends Fragment
         initUi();
         parentActivity.mReceiver = new WiFiDirectBroadcastReceiver(parentActivity.mWifiP2pManager, parentActivity.mChannel, parentActivity);
         parentActivity.registerReceiver(parentActivity.mReceiver, parentActivity.mIntentFilter);
+        rxBus.toObserverable().subscribe(SendMoneyFragment.this);
+
     }
 
     @Override
@@ -95,5 +123,29 @@ public class SendMoneyFragment extends Fragment
         parentActivity.unregisterReceiver(parentActivity.mReceiver);
     }
 
+    @Override
+    public void onCompleted() {
 
+    }
+
+    @Override
+    public void onError(Throwable e) {
+
+    }
+
+    @Override
+    public void onNext(Object o) {
+        EventResponse eventResponse = (EventResponse) o;
+        switch (((EventResponse) o).getEvent()) {
+            case EventNumbers.CLIENT_ASYNC_EVENT:
+                parentActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressDialog.dismiss();
+                        parentActivity.textView.setText(String.valueOf(parentActivity.balance));
+                        //--------------------------------------------------------------------------------------- database entry if you can get transaction Object here
+                    }
+                });
+        }
+    }
 }

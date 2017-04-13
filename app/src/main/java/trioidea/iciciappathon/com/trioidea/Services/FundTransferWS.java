@@ -8,6 +8,7 @@ import com.google.gson.reflect.TypeToken;
 import org.json.JSONArray;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 
 import trioidea.iciciappathon.com.trioidea.DTO.BalanceEnquiryDTO;
 import trioidea.iciciappathon.com.trioidea.DTO.FundTransferDto;
@@ -31,11 +32,11 @@ public class FundTransferWS {
                     }.getType();
                     ArrayList<PostsDto> postsDto = gson.fromJson(jsonArray.toString(), type);
                     return postsDto;*/
-                Type type = new TypeToken<FundTransferDto>() {
+                Type type = new TypeToken<ArrayList<FundTransferDto>>() {
                 }.getType();
                 Log.e("Fund Transfer", jsonArray.toString());
-                FundTransferDto fundTransferDto = gson.fromJson(jsonArray.toString(), type);
-                fundTransferDtos[i] = fundTransferDto;
+                ArrayList<FundTransferDto> fundTransferDto = gson.fromJson(jsonArray.toString(), type);
+                fundTransferDtos[i] = fundTransferDto.get(0);
             } catch (Exception e) {
                 return null;
             }
@@ -44,3 +45,5 @@ public class FundTransferWS {
         return eventResponse;
     }
 }
+
+

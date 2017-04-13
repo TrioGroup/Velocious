@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 import android.widget.EditText;
 
+import trioidea.iciciappathon.com.trioidea.DTO.TransactionDTOEncrypted;
 import trioidea.iciciappathon.com.trioidea.DTO.TransactionDto;
 
 /**
@@ -27,7 +28,7 @@ public class DbHelper extends SQLiteOpenHelper {
         super(context, dbName, null, dbVersion);
         this.context = context;
         //SQLiteDatabase.openOrCreateDatabase(context.getDatabasePath(dbName),null);
-        db=this.getWritableDatabase();
+        db = this.getWritableDatabase();
         //mydatabase = SQLiteDatabase.openOrCreateDatabase("transactionDB",null);
     }
 
@@ -63,12 +64,23 @@ public class DbHelper extends SQLiteOpenHelper {
         values.put("balance", EncryptionClass.symmetricEncrypt(String.valueOf(transactionDto.getBalance())).trim());
         values.put("sync_flag", EncryptionClass.symmetricEncrypt(String.valueOf(transactionDto.isSyncFlag())).trim());
 
-
         //String insertQuery = "INSERT INTO transactions VALUES(\"" + transactionId.trim() + "\",\"" + senderID.trim() + "\",\"" + senderName.trim() + "\",\"" + receiverId.trim() + "\",\"" + receiverName.trim() + "\",\"" + amount.trim() + "\",\"" + time.trim() + "\",\"" + balance.trim() + "\",\"" + syncFlag .trim()+ "\");";
         db.insert("transactions", null, values);
-        String selectQuery = "SELECT * FROM transactions WHERE t_id=\"1\";";
-        Cursor cursor = db.rawQuery(selectQuery, null);
-        cursor.close();
+    }
+
+    public void insertEncryptedValuesInTransaction(TransactionDTOEncrypted transactionDto) {
+        ContentValues values = new ContentValues();
+        values.put("t_id", (String.valueOf(transactionDto.getTransactionId())).trim());
+        values.put("sender_id", (String.valueOf(transactionDto.getSenderID())).trim());
+        values.put("sender_name", (String.valueOf(transactionDto.getSenderName())).trim());
+        values.put("receiver_id", (String.valueOf(transactionDto.getReceiverId())).trim());
+        values.put("receiver_name", (String.valueOf(transactionDto.getReceiverName())).trim());
+        values.put("amount", (String.valueOf(transactionDto.getAmount())).trim());
+        values.put("time", (String.valueOf(transactionDto.getTime())).trim());
+        values.put("balance", (String.valueOf(transactionDto.getBalance())).trim());
+        values.put("sync_flag", (String.valueOf(transactionDto.getSyncFlag())).trim());
+        //String insertQuery = "INSERT INTO transactions VALUES(\"" + transactionId.trim() + "\",\"" + senderID.trim() + "\",\"" + senderName.trim() + "\",\"" + receiverId.trim() + "\",\"" + receiverName.trim() + "\",\"" + amount.trim() + "\",\"" + time.trim() + "\",\"" + balance.trim() + "\",\"" + syncFlag .trim()+ "\");";
+        db.insert("transactions", null, values);
     }
 
     public TransactionDto[] getAllTransaction() {
@@ -90,12 +102,12 @@ public class DbHelper extends SQLiteOpenHelper {
             int count = cursor.getCount();
             transactionDtos = new TransactionDto[count];
             int i = 0;
-            int temp=cursor.getPosition();
+            int temp = cursor.getPosition();
 
             do {
 
-                Log.e("DBTEST",""+EncryptionClass.symmetricDecrypt(cursor.getString(0)));
-                Log.e("DBTEST",""+EncryptionClass.symmetricDecrypt(cursor.getString(1)));
+                Log.e("DBTEST", "" + EncryptionClass.symmetricDecrypt(cursor.getString(0)));
+                Log.e("DBTEST", "" + EncryptionClass.symmetricDecrypt(cursor.getString(1)));
                 /*transactionId = Integer.parseInt((cursor.getString(0)));
                 senderID = Integer.parseInt((cursor.getString(1)));*/
                 transactionId = Integer.parseInt(EncryptionClass.symmetricDecrypt(cursor.getString(0)));
@@ -119,12 +131,56 @@ public class DbHelper extends SQLiteOpenHelper {
         }
     }
 
-    public TransactionDto[] getNotSyncedTransaction()
-    {
-        TransactionDto[] transactionDtos=null;
-        TransactionDto[] transactionDtosToPass=null;
-        transactionDtos=getAllTransaction();
-        if(transactionDtos!=null) {
+    public TransactionDTOEncrypted[] getAllTransactionNotDecrypted() {
+        String selectQuery = "SELECT * FROM transactions;";
+        String transactionId;
+        String senderID;
+        String senderName;
+        String receiverId;
+        String receiverName;
+        String amount;
+        String time;
+        String balance;
+        String syncFlag;
+        TransactionDTOEncrypted[] transactionDtosEncrypteds = null;
+        try {
+            Cursor cursor = db.rawQuery(selectQuery, null);
+            //Cursor cursor = db.query(true, "transactions", comlumns, null, null, null, null, null, null);
+            cursor.moveToFirst();
+            int count = cursor.getCount();
+            transactionDtosEncrypteds = new TransactionDTOEncrypted[count];
+            int i = 0;
+            int temp = cursor.getPosition();
+
+            do {
+                /*transactionId = Integer.parseInt((cursor.getString(0)));
+                senderID = Integer.parseInt((cursor.getString(1)));*/
+                transactionId = cursor.getString(0);
+                senderID = cursor.getString(1);
+                senderName = cursor.getString(2);
+                receiverId = cursor.getString(3);
+                receiverName = cursor.getString(4);
+                amount = cursor.getString(5);
+                time = cursor.getString(6);
+                balance = cursor.getString(7);
+                syncFlag = cursor.getString(8);
+                transactionDtosEncrypteds[i] = new TransactionDTOEncrypted(transactionId, senderID, senderName, receiverId, receiverName, amount, time, balance, syncFlag);
+                //transactionDtos[i] = new TransactionDto(transactionId, senderID, null,0,null, 0, null,0,false);
+                //Log.e("DBTEST",""+transactionDtos[i].getTransactionId());
+                i++;
+            } while (cursor.moveToNext());
+            cursor.close();
+            return transactionDtosEncrypteds;
+        } catch (Exception e) {
+            return transactionDtosEncrypteds;
+        }
+    }
+
+    public TransactionDto[] getNotSyncedTransaction() {
+        TransactionDto[] transactionDtos = null;
+        TransactionDto[] transactionDtosToPass = null;
+        transactionDtos = getAllTransaction();
+        if (transactionDtos != null) {
             transactionDtosToPass = new TransactionDto[transactionDtos.length];
             int j = 0;
             for (int i = 0; i < transactionDtos.length; i++) {
@@ -136,12 +192,12 @@ public class DbHelper extends SQLiteOpenHelper {
         }
         return transactionDtosToPass;
     }
-    public void markSynced(TransactionDto transactionDto)
-    {
+
+    public void markSynced(TransactionDto transactionDto) {
         //String selectQuery = "UPDATE transactions SET sync_flag=\""+transactionDto.isSyncFlag()+"\" WHERE t_id=\""+transactionDto.getTransactionId()+"\";";
         ContentValues values = new ContentValues();
         values.put("sync_flag", EncryptionClass.symmetricEncrypt(String.valueOf(transactionDto.isSyncFlag())).trim());
-        db.update("transactions",values,"WHERE t_id=\'"+transactionDto.getTransactionId()+"\'",null);
+        db.update("transactions", values, "WHERE t_id=\'" + transactionDto.getTransactionId() + "\'", null);
 
     }
 }
