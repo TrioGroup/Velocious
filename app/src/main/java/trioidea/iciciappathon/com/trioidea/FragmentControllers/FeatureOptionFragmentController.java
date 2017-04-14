@@ -123,6 +123,7 @@ public class FeatureOptionFragmentController implements Observer, View.OnClickLi
 
 
                 TransactionDto[] transactionDtos = DbHelper.getInstance(featureOptionFragment.getActivity()).getAllTransaction();
+                if(transactionDtos!=null)
                 Log.e("DBTEST", "incontroller" + transactionDtos[0].getTransactionId());
                 ServiceLayer serviceLayer=ServiceLayer.getServiceLayer();
                 serviceLayer.autheticateUser();

@@ -40,7 +40,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String CREATE_TABLE_TRANSACTION = "CREATE TABLE transactions(t_id TEXT PRIMARY KEY,sender_id TEXT,sender_name TEXT,receiver_id TEXT,receiver_name TEXT,amount TEXT,time TEXT,balance TEXT,sync_flag TEXT);";
+        String CREATE_TABLE_TRANSACTION = "CREATE TABLE transactions(t_id INTEGER PRIMARY KEY AUTOINCREMENT,sender_id TEXT,sender_name TEXT,receiver_id TEXT,receiver_name TEXT,amount TEXT,time TEXT,balance TEXT,sync_flag TEXT);";
         //String CREATE_TABLE_TRANSACTION = "CREATE TABLE transactions(t_id TEXT,sender_id TEXT);";
         db.execSQL(CREATE_TABLE_TRANSACTION);
     }
@@ -54,7 +54,7 @@ public class DbHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
        /* values.put("t_id", String.valueOf(transactionDto.getTransactionId()));
         values.put("sender_id", String.valueOf(transactionDto.getSenderID()));*/
-        values.put("t_id", EncryptionClass.symmetricEncrypt(String.valueOf(transactionDto.getTransactionId())).trim());
+        //values.put("t_id", EncryptionClass.symmetricEncrypt(String.valueOf(transactionDto.getTransactionId())).trim());
         values.put("sender_id", EncryptionClass.symmetricEncrypt(String.valueOf(transactionDto.getSenderID())).trim());
         values.put("sender_name", EncryptionClass.symmetricEncrypt(String.valueOf(transactionDto.getSenderName())).trim());
         values.put("receiver_id", EncryptionClass.symmetricEncrypt(String.valueOf(transactionDto.getReceiverId())).trim());
@@ -70,7 +70,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
     public void insertEncryptedValuesInTransaction(TransactionDTOEncrypted transactionDto) {
         ContentValues values = new ContentValues();
-        values.put("t_id", (String.valueOf(transactionDto.getTransactionId())).trim());
+        //values.put("t_id", (String.valueOf(transactionDto.getTransactionId())).trim());
         values.put("sender_id", (String.valueOf(transactionDto.getSenderID())).trim());
         values.put("sender_name", (String.valueOf(transactionDto.getSenderName())).trim());
         values.put("receiver_id", (String.valueOf(transactionDto.getReceiverId())).trim());
@@ -106,11 +106,11 @@ public class DbHelper extends SQLiteOpenHelper {
 
             do {
 
-                Log.e("DBTEST", "" + EncryptionClass.symmetricDecrypt(cursor.getString(0)));
-                Log.e("DBTEST", "" + EncryptionClass.symmetricDecrypt(cursor.getString(1)));
+               // Log.e("DBTEST", "" + EncryptionClass.symmetricDecrypt(cursor.getString(0)));
+                //Log.e("DBTEST", "" + EncryptionClass.symmetricDecrypt(cursor.getString(1)));
                 /*transactionId = Integer.parseInt((cursor.getString(0)));
                 senderID = Integer.parseInt((cursor.getString(1)));*/
-                transactionId = Integer.parseInt(EncryptionClass.symmetricDecrypt(cursor.getString(0)));
+               transactionId =cursor.getInt(0);
                 senderID = Integer.parseInt(EncryptionClass.symmetricDecrypt(cursor.getString(1)));
                 senderName = EncryptionClass.symmetricDecrypt(cursor.getString(2));
                 receiverId = Integer.parseInt(EncryptionClass.symmetricDecrypt(cursor.getString(3)));

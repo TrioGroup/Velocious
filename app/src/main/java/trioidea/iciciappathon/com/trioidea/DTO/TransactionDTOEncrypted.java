@@ -26,6 +26,9 @@ public class TransactionDTOEncrypted {
         this.syncFlag = syncFlag;
     }
 
+    public TransactionDTOEncrypted()
+    {}
+
     public String getTransactionId() {
 
         return transactionId;

@@ -15,6 +15,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 
 import trioidea.iciciappathon.com.trioidea.Activities.TransferActivity;
+import trioidea.iciciappathon.com.trioidea.DTO.TransactionDto;
 import trioidea.iciciappathon.com.trioidea.EncryptionClass;
 import trioidea.iciciappathon.com.trioidea.EventNumbers;
 import trioidea.iciciappathon.com.trioidea.EventResponse;
@@ -32,6 +33,7 @@ public class FileClientAsyncTask extends AsyncTask {
     byte buf[];
     String data;
     TransferActivity activity;
+    TransactionDto transactionData;
 
     public FileClientAsyncTask(Context context, InetAddress hostId, String amount, TransferActivity main) {
         this.context = context;
@@ -48,7 +50,12 @@ public class FileClientAsyncTask extends AsyncTask {
             Log.e("p2p", "connecting to server socket");
             socket.connect((new InetSocketAddress(host, port)), 500);
             Log.e("p2p", "------------------data: " + data.trim() + "--------------------------------------");
-            buf = EncryptionClass.symmetricEncrypt(data.trim()+":sentence").getBytes();
+            buf = EncryptionClass.symmetricEncrypt(data.trim()+":2222:Pritesh").getBytes();
+
+            transactionData = new TransactionDto();
+            transactionData.setSenderID(2222);
+            transactionData.setSenderName("Pritesh");
+            transactionData.setAmount(Double.parseDouble(data));
 
             OutputStream outputStream = socket.getOutputStream();
             InputStream inputStream = socket.getInputStream();
@@ -65,6 +72,13 @@ public class FileClientAsyncTask extends AsyncTask {
             if (receivedStrings[0].equals("s")) {
                 activity.balance = activity.balance - Double.parseDouble(data);
                 Log.e("p2p", "Current balance" + activity.balance);
+
+                transactionData.setReceiverId(Integer.parseInt(receivedStrings[1]));
+                transactionData.setReceiverName(receivedStrings[2]);
+                transactionData.setTime(receivedStrings[3]);
+                transactionData.setBalance(activity.balance);
+                transactionData.setSyncFlag(false);
+
                 buf = null;
                 buf = new byte[64];
                 buf = "s".getBytes();
@@ -114,10 +128,11 @@ public class FileClientAsyncTask extends AsyncTask {
                     }
                 }
             }
+            EventResponse eventResponse = new EventResponse(transactionData, EventNumbers.CLIENT_ASYNC_EVENT);
+            RxBus rxBus=RxBus.getInstance();
+            rxBus.send(eventResponse);
+            return 0;
         }
-        EventResponse eventResponse = new EventResponse(0, EventNumbers.CLIENT_ASYNC_EVENT);
-        RxBus rxBus=RxBus.getInstance();
-        rxBus.send(eventResponse);
-        return 0;
+
     }
 }

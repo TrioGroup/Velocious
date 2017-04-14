@@ -4,9 +4,11 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,13 +22,18 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Date;
 import java.util.concurrent.Callable;
 
 import rx.Observable;
 import rx.Observer;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import trioidea.iciciappathon.com.trioidea.Activities.TransferActivity;
+import trioidea.iciciappathon.com.trioidea.DTO.TransactionDTOEncrypted;
+import trioidea.iciciappathon.com.trioidea.DTO.TransactionDto;
+import trioidea.iciciappathon.com.trioidea.DbHelper;
 import trioidea.iciciappathon.com.trioidea.EncryptionClass;
 import trioidea.iciciappathon.com.trioidea.EventNumbers;
 import trioidea.iciciappathon.com.trioidea.EventResponse;
@@ -43,7 +50,8 @@ public class TransactionMainScreenFragment extends Fragment implements Observer{
     ServerSocket serverSocket;
     Socket client;
     TransferActivity parentActivity;
-
+    TransactionDto transactionData;
+    Subscription subscription;
 
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle savedInstanceState)
@@ -126,17 +134,39 @@ public class TransactionMainScreenFragment extends Fragment implements Observer{
 
                                                     OutputStream outputStream = client.getOutputStream();
                                                     InputStream inputStream = client.getInputStream();
+                                                    transactionData = new TransactionDto();
+
+                                                    String timeSettings = android.provider.Settings.System.getString(getActivity().getContentResolver(), android.provider.Settings.Global.AUTO_TIME);
+                                                    if(timeSettings.equals("0"))
+                                                    {
+                                                        Settings.System.putString(getActivity().getContentResolver(), android.provider.Settings.Global.AUTO_TIME,"1");
+                                                        getActivity().startActivityForResult(new Intent(android.provider.Settings.ACTION_DATE_SETTINGS), 0);
+                                                    }
+                                                    double now=System.currentTimeMillis();
+                                                    Log.e("Time ",""+now);
+
                                                     if(inputStream.read(buf)!=0)
                                                     {
                                                         String received = new String(buf).trim();
                                                         received = EncryptionClass.symmetricDecrypt(received);
                                                         String[] receivedStrings=received.split(":");
                                                         Log.e("p2p", "data received" + received);
+
                                                         String amount = receivedStrings[0].trim();
                                                         parentActivity.balance = parentActivity.balance + Double.parseDouble(amount);
                                                         Log.e("p2p", "Updated balance : " + parentActivity.balance);
+
+                                                        transactionData.setAmount(Double.parseDouble(amount));
+                                                        transactionData.setReceiverId(1111);
+                                                        transactionData.setReceiverName("Harshal");
+                                                        transactionData.setSenderID(Integer.parseInt(receivedStrings[1]));
+                                                        transactionData.setSenderName(receivedStrings[2]);
+                                                        transactionData.setTime(String.valueOf(now));
+                                                        transactionData.setSyncFlag(false);
+                                                        transactionData.setBalance(parentActivity.balance);
                                                     }
-                                                    buf = EncryptionClass.symmetricEncrypt("s"+":paragraph").getBytes();
+                                                    buf = EncryptionClass.symmetricEncrypt("s"+":1111:Harshal:"+now).getBytes();
+                                                    Log.e("receiver","buf"+buf);
                                                     outputStream.write(buf);
                                                     Log.e("p2p", "data sent back");
                                                     buf=null;
@@ -144,7 +174,7 @@ public class TransactionMainScreenFragment extends Fragment implements Observer{
                                                     if(inputStream.read(buf)!=0)
                                                     {
                                                         String received = new String(buf).trim();
-                                                        received = EncryptionClass.symmetricDecrypt(received);
+                                                        //received = EncryptionClass.symmetricDecrypt(received);
                                                         if(received == "s")
                                                         {
                                                             Log.e("p2p", "Transaction Complete for Server" + received);
@@ -202,13 +232,14 @@ public class TransactionMainScreenFragment extends Fragment implements Observer{
                                                             }
                                                         }
                                                     }
+                                                    EventResponse eventResponse=new EventResponse(0,EventNumbers.SERVER_ASYNC_EVENT);
+                                                    return eventResponse;
                                                 }
-                                                EventResponse eventResponse=new EventResponse(0,EventNumbers.SERVER_ASYNC_EVENT);
-                                                return eventResponse;
+
                                             }
 
                                         });
-                                        observable.subscribeOn(Schedulers.io()).observeOn(Schedulers.computation()).subscribe(TransactionMainScreenFragment.this);
+                                        subscription=observable.subscribeOn(Schedulers.io()).observeOn(Schedulers.computation()).subscribe(TransactionMainScreenFragment.this);
 
                                     }
 
@@ -253,10 +284,17 @@ public class TransactionMainScreenFragment extends Fragment implements Observer{
                     public void run() {
                         parentActivity.textView.setText(String.valueOf(parentActivity.balance));
                         progressDialog.dismiss();
-                        //--------------------------------------------------------------------------------------- database entry if you can get transaction Object here
 
                     }
                 });
+
+                // adding data in database----------------------------------------------------------
+                DbHelper db = DbHelper.getInstance(this.getActivity());
+                db.insertTransaction(transactionData);
+                TransactionDto[] transactionDtos=db.getAllTransaction();
+                for(int i=0;i<transactionDtos.length;i++)
+                    Log.e("receiver","length:"+transactionDtos.length+" first:"+transactionDtos[i].getAmount());
+                subscription.unsubscribe();
         }
     }
 }

@@ -18,7 +18,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import rx.Observer;
+import rx.Subscription;
 import trioidea.iciciappathon.com.trioidea.Activities.TransferActivity;
+import trioidea.iciciappathon.com.trioidea.DTO.TransactionDto;
+import trioidea.iciciappathon.com.trioidea.DbHelper;
 import trioidea.iciciappathon.com.trioidea.EventNumbers;
 import trioidea.iciciappathon.com.trioidea.EventResponse;
 import trioidea.iciciappathon.com.trioidea.R;
@@ -35,6 +38,7 @@ public class SendMoneyFragment extends Fragment implements Observer
     ProgressDialog progressDialog;
     TransferActivity parentActivity;
     RxBus rxBus=RxBus.getInstance();
+    Subscription subscription;
 
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle savedInstanceState)
@@ -113,7 +117,7 @@ public class SendMoneyFragment extends Fragment implements Observer
         initUi();
         parentActivity.mReceiver = new WiFiDirectBroadcastReceiver(parentActivity.mWifiP2pManager, parentActivity.mChannel, parentActivity);
         parentActivity.registerReceiver(parentActivity.mReceiver, parentActivity.mIntentFilter);
-        rxBus.toObserverable().subscribe(SendMoneyFragment.this);
+        subscription=rxBus.toObserverable().subscribe(SendMoneyFragment.this);
 
     }
 
@@ -143,9 +147,19 @@ public class SendMoneyFragment extends Fragment implements Observer
                     public void run() {
                         progressDialog.dismiss();
                         parentActivity.textView.setText(String.valueOf(parentActivity.balance));
-                        //--------------------------------------------------------------------------------------- database entry if you can get transaction Object here
                     }
                 });
+
+                // Adding data in database
+                DbHelper db = DbHelper.getInstance(this.getActivity());
+                TransactionDto transactionData = (TransactionDto)((EventResponse) o).getResponse();
+                           db.insertTransaction(transactionData);
+                TransactionDto[] transactionDtos=db.getAllTransaction();
+                Log.e("p2p","Entry Made");
+                for(int i=0;i<transactionDtos.length;i++)
+                Log.e("sender done","length:"+transactionDtos.length+" first:"+transactionDtos[i].getAmount());
+                subscription.unsubscribe();
+
         }
     }
 }
