@@ -71,4 +71,9 @@ public class MainScreen extends AppCompatActivity {
         Intent intent = new Intent(this, TransferActivity.class);
         startActivity(intent);
     }
+
+    public void changeTitle(String title)
+    {
+        getSupportActionBar().setTitle((Html.fromHtml("<font color=\"#000000\">" + title + "</font>")));
+    }
 }

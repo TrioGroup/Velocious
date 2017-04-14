@@ -27,6 +27,7 @@ import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import trioidea.iciciappathon.com.trioidea.Activities.TransferActivity;
+import trioidea.iciciappathon.com.trioidea.EncryptionClass;
 import trioidea.iciciappathon.com.trioidea.EventNumbers;
 import trioidea.iciciappathon.com.trioidea.EventResponse;
 import trioidea.iciciappathon.com.trioidea.R;
@@ -128,13 +129,14 @@ public class TransactionMainScreenFragment extends Fragment implements Observer{
                                                     if(inputStream.read(buf)!=0)
                                                     {
                                                         String received = new String(buf).trim();
+                                                        received = EncryptionClass.symmetricDecrypt(received);
                                                         String[] receivedStrings=received.split(":");
                                                         Log.e("p2p", "data received" + received);
                                                         String amount = receivedStrings[0].trim();
                                                         parentActivity.balance = parentActivity.balance + Double.parseDouble(amount);
                                                         Log.e("p2p", "Updated balance : " + parentActivity.balance);
                                                     }
-                                                    buf = ("s"+":paragraph").getBytes();
+                                                    buf = EncryptionClass.symmetricEncrypt("s"+":paragraph").getBytes();
                                                     outputStream.write(buf);
                                                     Log.e("p2p", "data sent back");
                                                     buf=null;
@@ -142,6 +144,7 @@ public class TransactionMainScreenFragment extends Fragment implements Observer{
                                                     if(inputStream.read(buf)!=0)
                                                     {
                                                         String received = new String(buf).trim();
+                                                        received = EncryptionClass.symmetricDecrypt(received);
                                                         if(received == "s")
                                                         {
                                                             Log.e("p2p", "Transaction Complete for Server" + received);

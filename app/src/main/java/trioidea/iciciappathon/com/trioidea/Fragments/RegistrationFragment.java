@@ -10,12 +10,11 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import trioidea.iciciappathon.com.trioidea.Activities.MainScreen;
 import trioidea.iciciappathon.com.trioidea.EncryptionClass;
-import trioidea.iciciappathon.com.trioidea.FragmentControllers.FeatureOptionFragmentController;
 import trioidea.iciciappathon.com.trioidea.FragmentControllers.RegistrationFragmentController;
 import trioidea.iciciappathon.com.trioidea.R;
 
@@ -42,6 +41,7 @@ public class RegistrationFragment extends Fragment {
         super.onResume();
         registrationFragmentController = new RegistrationFragmentController(this);
         init();
+        ((MainScreen)getActivity()).changeTitle("Register");
         resetUi();
     }
 
@@ -50,7 +50,7 @@ public class RegistrationFragment extends Fragment {
         //etName.addTextChangedListener(this);
         etAddress = (EditText) RegistrationFragment.this.getActivity().findViewById(R.id.et_address);
         etPhoneNumber = (EditText) RegistrationFragment.this.getActivity().findViewById(R.id.et_phone);
-        etAadhar = (EditText) RegistrationFragment.this.getActivity().findViewById(R.id.et_aadhar);
+        etAadhar = (EditText) RegistrationFragment.this.getActivity().findViewById(R.id.et_account_number);
         etCard = (EditText) RegistrationFragment.this.getActivity().findViewById(R.id.et_card);
         register = (ImageButton) RegistrationFragment.this.getActivity().findViewById(R.id.btn_register);
         register.setOnClickListener(registrationFragmentController);
@@ -83,7 +83,7 @@ public class RegistrationFragment extends Fragment {
             tilPhoneNumber.setErrorEnabled(true);
             flag = false;
         }
-        if (etPhoneNumber.getText().toString().length() < 10) {
+        else if (etPhoneNumber.getText().toString().length() < 10) {
             tilPhoneNumber.setError("Phone Number invalid.");
             tilPhoneNumber.setErrorEnabled(true);
             flag = false;
@@ -93,7 +93,7 @@ public class RegistrationFragment extends Fragment {
             tilAadhar.setErrorEnabled(true);
             flag=false;
         }
-        if(etAadhar.getText().length() < 12)
+        else if(etAadhar.getText().length() < 12)
         {
             tilAadhar.setError("Aadhar card number is invalid.");
             tilAadhar.setErrorEnabled(true);
@@ -105,7 +105,7 @@ public class RegistrationFragment extends Fragment {
             tilCard.setErrorEnabled(true);
             flag=false;
         }
-        if(etCard.getText().length()<16)
+        else if(etCard.getText().length()<16)
         {
             tilCard.setError("Card Number is invalid.");
             tilCard.setErrorEnabled(true);

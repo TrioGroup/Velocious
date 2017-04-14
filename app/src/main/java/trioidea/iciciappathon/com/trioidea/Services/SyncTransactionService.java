@@ -88,7 +88,7 @@ public class SyncTransactionService extends Service implements Observer {
             // ArrayList<TransactionDto> transactionDto=(ArrayList<TransactionDto>)intent.getSerializableExtra("transactionDTO");
             SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("userData", MODE_PRIVATE);
             String tokenId = sharedPreferences.getString("tokenId", null);
-            if (tokenId.isEmpty() || tokenId == null) {
+            if (tokenId == null || tokenId.isEmpty()) {
                 Observable observable = Observable.fromCallable(new Callable() {
                     @Override
                     public Object call() throws Exception {

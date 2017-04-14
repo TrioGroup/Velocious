@@ -15,6 +15,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 
 import trioidea.iciciappathon.com.trioidea.Activities.TransferActivity;
+import trioidea.iciciappathon.com.trioidea.EncryptionClass;
 import trioidea.iciciappathon.com.trioidea.EventNumbers;
 import trioidea.iciciappathon.com.trioidea.EventResponse;
 import trioidea.iciciappathon.com.trioidea.RxBus;
@@ -47,7 +48,7 @@ public class FileClientAsyncTask extends AsyncTask {
             Log.e("p2p", "connecting to server socket");
             socket.connect((new InetSocketAddress(host, port)), 500);
             Log.e("p2p", "------------------data: " + data.trim() + "--------------------------------------");
-            buf = (data.trim()+":sentence").getBytes();
+            buf = EncryptionClass.symmetricEncrypt(data.trim()+":sentence").getBytes();
 
             OutputStream outputStream = socket.getOutputStream();
             InputStream inputStream = socket.getInputStream();
@@ -58,6 +59,7 @@ public class FileClientAsyncTask extends AsyncTask {
             buf = new byte[2048];
             inputStream.read(buf);
             String received = new String(buf).trim();
+            received = EncryptionClass.symmetricDecrypt(received);
             Log.e("p2p", "Data got back" + received);
             String[] receivedStrings=received.split(":");
             if (receivedStrings[0].equals("s")) {

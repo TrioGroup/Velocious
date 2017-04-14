@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">velocious</string>
+    <string name="app_name">Velocious</string>
     <string name="btn_offline_transaction">Offline Transaction</string>
     <string name="btn_shopping_assist">Shopping Assist</string>
     <string name="compose_shortcut_short_label1"></string>
@@ -7,4 +7,5 @@
     <string name="receive">Receive</string>
     <string name="available_devices">Available Devices</string>
     <string name="balance">Balance</string>
+        <string name="font_name_raleway">raleway</string>
 </resources>

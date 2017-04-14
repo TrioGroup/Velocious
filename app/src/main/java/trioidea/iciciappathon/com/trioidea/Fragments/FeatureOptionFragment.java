@@ -20,10 +20,7 @@ import trioidea.iciciappathon.com.trioidea.R;
 public class FeatureOptionFragment extends Fragment {
 
     FeatureOptionFragmentController mController;
-    Button offline;
-
-
-    ImageButton shopping;
+    ImageButton shopping,offline;
 
     @Nullable
     @Override
@@ -39,7 +36,7 @@ public class FeatureOptionFragment extends Fragment {
     }
     public void init()
     {
-        offline=(Button)getActivity().findViewById(R.id.btn_offline_transaction);
+        offline=(ImageButton)getActivity().findViewById(R.id.btn_offline_transaction);
         shopping=(ImageButton)getActivity().findViewById(R.id.btn_shopping_assist);
         offline.setOnClickListener(mController);
         shopping.setOnClickListener(mController);
