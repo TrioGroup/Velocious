@@ -200,4 +200,9 @@ public class DbHelper extends SQLiteOpenHelper {
         db.update("transactions", values, "WHERE t_id=\'" + transactionDto.getTransactionId() + "\'", null);
 
     }
+
+    public String getBalance()
+    {
+        return null;
+    }
 }

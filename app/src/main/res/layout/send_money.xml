@@ -58,7 +58,7 @@
       </TextView>
       <EditText
           android:id="@+id/amount"
-
+          android:inputType="numberDecimal"
           android:layout_width="50dp"
           android:layout_height="wrap_content"
           android:maxLength="8">

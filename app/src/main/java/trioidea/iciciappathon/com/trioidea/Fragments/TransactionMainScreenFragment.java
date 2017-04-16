@@ -5,6 +5,9 @@ import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
@@ -52,6 +55,8 @@ public class TransactionMainScreenFragment extends Fragment implements Observer{
     TransferActivity parentActivity;
     TransactionDto transactionData;
     Subscription subscription;
+    String receiverName;
+    int receiverId;
 
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle savedInstanceState)
@@ -90,6 +95,7 @@ public class TransactionMainScreenFragment extends Fragment implements Observer{
                                 if (reason == 2)
                                     Toast.makeText(getActivity(), "Start your wifi and try again", Toast.LENGTH_SHORT).show();
                             }
+
                         });
             }
         });
@@ -97,93 +103,103 @@ public class TransactionMainScreenFragment extends Fragment implements Observer{
         (getActivity().findViewById(R.id.wifi_receive)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                progressDialog=new ProgressDialog(TransactionMainScreenFragment.this.getActivity());
+
+                progressDialog = new ProgressDialog(TransactionMainScreenFragment.this.getActivity());
                 progressDialog.setMessage("Waiting for sender");
                 progressDialog.setProgress(0);
                 progressDialog.setCancelable(false);
-
-
-                final AlertDialog alertDialog=new AlertDialog.Builder(TransactionMainScreenFragment.this.getActivity()).create();
+                ConnectivityManager connManager = (ConnectivityManager) parentActivity.getSystemService(parentActivity.getApplicationContext().CONNECTIVITY_SERVICE);
+                NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+                if (!mWifi.isConnected())
+                Toast.makeText(getActivity(), "Start your wifi and try again", Toast.LENGTH_SHORT).show();
+                else
+                {
+                final AlertDialog alertDialog = new AlertDialog.Builder(TransactionMainScreenFragment.this.getActivity()).create();
                 alertDialog.setMessage("Are you sure you want to Receive Money?");
                 alertDialog.setTitle("Alert");
                 alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        progressDialog.show();
-                        Log.e("p2p", "discoverPeers() called--receiver");
-                        (parentActivity).getManager()
-                                .discoverPeers(parentActivity.getChannel(), new WifiP2pManager.ActionListener() {
+                        ConnectivityManager connManager = (ConnectivityManager) parentActivity.getSystemService(parentActivity.getApplicationContext().CONNECTIVITY_SERVICE);
+                        NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+                        if (!mWifi.isConnected())
+                            Toast.makeText(getActivity(), "Start your wifi and try again", Toast.LENGTH_SHORT).show();
+                        if (mWifi.isConnected()) {
+                            progressDialog.show();
+                            Log.e("p2p", "discoverPeers() called--receiver");
+                            (parentActivity).getManager()
+                                    .discoverPeers(parentActivity.getChannel(), new WifiP2pManager.ActionListener() {
 
-                                    @Override
-                                    public void onSuccess() {
-                                        Log.e("p2p", "discoverPeers() Success--receiver");
-                                        //new FileServerAsyncTask(getActivity(),(TransferActivity)getActivity()).execute();
-                                        Observable observable=Observable.fromCallable(new Callable() {
-                                            @Override
-                                            public Object call() throws Exception {
-                                                Log.e("p2p","do in background of server");
-                                                try {
+                                        @Override
+                                        public void onSuccess() {
+                                            Log.e("p2p", "discoverPeers() Success--receiver");
+                                            //new FileServerAsyncTask(getActivity(),(TransferActivity)getActivity()).execute();
+                                            Observable observable = Observable.fromCallable(new Callable() {
+                                                @Override
+                                                public Object call() throws Exception {
+                                                    Log.e("p2p", "do in background of server");
+                                                    try {
 
-                                                    /**
-                                                     * Create a server socket and wait for client connections. This
-                                                     * call blocks until a connection is accepted from a client
-                                                     */
-                                                    serverSocket = new ServerSocket(8888);
-                                                    client = serverSocket.accept();
-                                                    Log.e("p2p","accepted socket");
+                                                        /**
+                                                         * Create a server socket and wait for client connections. This
+                                                         * call blocks until a connection is accepted from a client
+                                                         */
+                                                        serverSocket = new ServerSocket(8888);
+                                                        client = serverSocket.accept();
+                                                        Log.e("p2p", "accepted socket");
 
-                                                    OutputStream outputStream = client.getOutputStream();
-                                                    InputStream inputStream = client.getInputStream();
-                                                    transactionData = new TransactionDto();
+                                                        OutputStream outputStream = client.getOutputStream();
+                                                        InputStream inputStream = client.getInputStream();
+                                                        transactionData = new TransactionDto();
 
-                                                    String timeSettings = android.provider.Settings.System.getString(getActivity().getContentResolver(), android.provider.Settings.Global.AUTO_TIME);
-                                                    if(timeSettings.equals("0"))
-                                                    {
-                                                        Settings.System.putString(getActivity().getContentResolver(), android.provider.Settings.Global.AUTO_TIME,"1");
-                                                        getActivity().startActivityForResult(new Intent(android.provider.Settings.ACTION_DATE_SETTINGS), 0);
-                                                    }
-                                                    double now=System.currentTimeMillis();
-                                                    Log.e("Time ",""+now);
-
-                                                    if(inputStream.read(buf)!=0)
-                                                    {
-                                                        String received = new String(buf).trim();
-                                                        received = EncryptionClass.symmetricDecrypt(received);
-                                                        String[] receivedStrings=received.split(":");
-                                                        Log.e("p2p", "data received" + received);
-
-                                                        String amount = receivedStrings[0].trim();
-                                                        parentActivity.balance = parentActivity.balance + Double.parseDouble(amount);
-                                                        Log.e("p2p", "Updated balance : " + parentActivity.balance);
-
-                                                        transactionData.setAmount(Double.parseDouble(amount));
-                                                        transactionData.setReceiverId(1111);
-                                                        transactionData.setReceiverName("Harshal");
-                                                        transactionData.setSenderID(Integer.parseInt(receivedStrings[1]));
-                                                        transactionData.setSenderName(receivedStrings[2]);
-                                                        transactionData.setTime(String.valueOf(now));
-                                                        transactionData.setSyncFlag(false);
-                                                        transactionData.setBalance(parentActivity.balance);
-                                                    }
-                                                    buf = EncryptionClass.symmetricEncrypt("s"+":1111:Harshal:"+now).getBytes();
-                                                    Log.e("receiver","buf"+buf);
-                                                    outputStream.write(buf);
-                                                    Log.e("p2p", "data sent back");
-                                                    buf=null;
-                                                    buf=new byte[2048];
-                                                    if(inputStream.read(buf)!=0)
-                                                    {
-                                                        String received = new String(buf).trim();
-                                                        //received = EncryptionClass.symmetricDecrypt(received);
-                                                        if(received == "s")
-                                                        {
-                                                            Log.e("p2p", "Transaction Complete for Server" + received);
+                                                        String timeSettings = android.provider.Settings.System.getString(getActivity().getContentResolver(), android.provider.Settings.Global.AUTO_TIME);
+                                                        if (timeSettings.equals("0")) {
+                                                            Settings.System.putString(getActivity().getContentResolver(), android.provider.Settings.Global.AUTO_TIME, "1");
+                                                            getActivity().startActivityForResult(new Intent(android.provider.Settings.ACTION_DATE_SETTINGS), 0);
                                                         }
-                                                    }
-                                                    /**
-                                                     * If this code is reached, a client has connected and transferred data
-                                                     * Save the input stream from the client as a JPEG file
-                                                     */
+                                                        double now = System.currentTimeMillis();
+                                                        Log.e("Time ", "" + now);
+
+                                                        if (inputStream.read(buf) != 0) {
+
+                                                            String received = new String(buf).trim();
+                                                            received = EncryptionClass.symmetricDecrypt(received);
+                                                            String[] receivedStrings = received.split(":");
+                                                            Log.e("p2p", "data received" + received);
+
+                                                            String amount = receivedStrings[0].trim();
+                                                            parentActivity.balance = parentActivity.balance + Double.parseDouble(amount);
+                                                            Log.e("p2p", "Updated balance : " + parentActivity.balance);
+
+                                                            SharedPreferences sharedPreferences = parentActivity.getApplicationContext().getSharedPreferences("userData", 0);
+                                                            receiverName = EncryptionClass.symmetricDecrypt(sharedPreferences.getString("name", "User"));
+                                                            receiverId = Integer.parseInt(EncryptionClass.symmetricDecrypt(sharedPreferences.getString("aadhar","0000")));
+                                                            transactionData.setAmount(Double.parseDouble(amount));
+                                                            transactionData.setReceiverId(receiverId);
+                                                            transactionData.setReceiverName(receiverName);
+                                                            transactionData.setSenderID(Integer.parseInt(receivedStrings[1]));
+                                                            transactionData.setSenderName(receivedStrings[2]);
+                                                            transactionData.setTime(String.valueOf(now));
+                                                            transactionData.setSyncFlag(false);
+                                                            transactionData.setBalance(parentActivity.balance);
+                                                        }
+                                                        buf = EncryptionClass.symmetricEncrypt("s" + ":"+receiverId+":"+receiverName+":" + now).getBytes();
+                                                        Log.e("receiver", "buf" + buf);
+                                                        outputStream.write(buf);
+                                                        Log.e("p2p", "data sent back");
+                                                        buf = null;
+                                                        buf = new byte[2048];
+                                                        if (inputStream.read(buf) != 0) {
+                                                            String received = new String(buf).trim();
+                                                            //received = EncryptionClass.symmetricDecrypt(received);
+                                                            if (received == "s") {
+                                                                Log.e("p2p", "Transaction Complete for Server" + received);
+                                                            }
+                                                        }
+                                                        /**
+                                                         * If this code is reached, a client has connected and transferred data
+                                                         * Save the input stream from the client as a JPEG file
+                                                         */
 //            final File f = new File(Environment.getExternalStorageDirectory() + "/"
 //                    + context.getPackageName() + "/wifip2pshared-" + System.currentTimeMillis()
 //                    + ".jpg");
@@ -195,26 +211,28 @@ public class TransactionMainScreenFragment extends Fragment implements Observer{
 //            InputStream inputstream = client.getInputStream();
 //
 //            return f.getAbsolutePath();
-                                                } catch (IOException e) {
-                                                    Log.e("p2p", e.getMessage());
-                                                    return null;
-                                                }
-                                                finally {
-                                                    if (serverSocket != null) {
+                                                    } catch (IOException e) {
+                                                        Log.e("p2p", e.getMessage());
+                                                        return null;
+                                                    } finally {
+                                                        if (serverSocket != null) {
 //                if (serverSocket.isBound() || !serverSocket.isClosed())
-                                                        {
-                                                            try {
-                                                                Log.e("p2p", "Closing ServerSocket");
-                                                                serverSocket.close();
-                                                                client.close();
-                                                                parentActivity.disconnect();
-                                                                parentActivity.mWifiP2pManager.requestGroupInfo(parentActivity.mChannel, new WifiP2pManager.GroupInfoListener() {
-                                                                    @Override
-                                                                    public void onGroupInfoAvailable(WifiP2pGroup group) {
-                                                                        parentActivity.deletePersistentGroup(group);
-                                                                        Log.e("p2p"," group removed");
-                                                                    }
-                                                                });
+                                                            {
+                                                                try {
+
+                                                                    Log.e("p2p", "Closing ServerSocket");
+                                                                    serverSocket.close();
+                                                                    client.close();//----
+                                                                    parentActivity.disconnect();
+                                                                    parentActivity.mWifiP2pManager.requestGroupInfo(parentActivity.mChannel, new WifiP2pManager.GroupInfoListener() {
+                                                                        @Override
+                                                                        public void onGroupInfoAvailable(WifiP2pGroup group) {
+                                                                            parentActivity.deletePersistentGroup(group);
+                                                                            Log.e("p2p", " group removed");
+                                                                        }
+                                                                    });
+
+
 //                        activity.mIntentFilter=null;
 //                        activity.mWifiP2pManager.removeGroup(activity.mChannel, new WifiP2pManager.ActionListener() {
 //                            @Override
@@ -227,29 +245,31 @@ public class TransactionMainScreenFragment extends Fragment implements Observer{
 //                                Log.e("p2p", "Failed to close wifi connection.. reason: "+reason);
 //                            }
 //                        });
-                                                            } catch (IOException e) {
-                                                                //catch logic
+                                                                } catch (IOException e) {
+                                                                    //catch logic
+                                                                }
                                                             }
                                                         }
+                                                        parentActivity.mobiles.clear();
+                                                        EventResponse eventResponse = new EventResponse(0, EventNumbers.SERVER_ASYNC_EVENT);
+                                                        return eventResponse;
                                                     }
-                                                    EventResponse eventResponse=new EventResponse(0,EventNumbers.SERVER_ASYNC_EVENT);
-                                                    return eventResponse;
+
                                                 }
 
-                                            }
+                                            });
+                                            subscription = observable.subscribeOn(Schedulers.io()).observeOn(Schedulers.computation()).subscribe(TransactionMainScreenFragment.this);
 
-                                        });
-                                        subscription=observable.subscribeOn(Schedulers.io()).observeOn(Schedulers.computation()).subscribe(TransactionMainScreenFragment.this);
+                                        }
 
-                                    }
-
-                                    @Override
-                                    public void onFailure(int reason) {
-                                        Log.e("p2p", "discoverPeers() Failure: " + reason);
-                                        if (reason == 2)
-                                            Toast.makeText(getActivity(), "Start your wifi and try again", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
+                                        @Override
+                                        public void onFailure(int reason) {
+                                            Log.e("p2p", "discoverPeers() Failure: " + reason);
+                                            if (reason == 2)
+                                                Toast.makeText(getActivity(), "Start your wifi and try again", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                        }
                     }
                 });
                 alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "No", new DialogInterface.OnClickListener() {
@@ -259,7 +279,7 @@ public class TransactionMainScreenFragment extends Fragment implements Observer{
                     }
                 });
                 alertDialog.show();
-            }
+            }}
         });
     }
 

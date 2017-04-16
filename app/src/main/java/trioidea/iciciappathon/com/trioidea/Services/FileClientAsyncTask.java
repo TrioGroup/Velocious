@@ -1,6 +1,7 @@
 package trioidea.iciciappathon.com.trioidea.Services;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.AsyncTask;
@@ -50,11 +51,16 @@ public class FileClientAsyncTask extends AsyncTask {
             Log.e("p2p", "connecting to server socket");
             socket.connect((new InetSocketAddress(host, port)), 500);
             Log.e("p2p", "------------------data: " + data.trim() + "--------------------------------------");
-            buf = EncryptionClass.symmetricEncrypt(data.trim()+":2222:Pritesh").getBytes();
+
+            SharedPreferences sharedPreferences = activity.getApplicationContext().getSharedPreferences("userData", 0);
+            String senderName = EncryptionClass.symmetricDecrypt(sharedPreferences.getString("name", "User"));
+            int senderId = Integer.parseInt(EncryptionClass.symmetricDecrypt(sharedPreferences.getString("aadhar", "0000")));
+
+            buf = EncryptionClass.symmetricEncrypt(data.trim()+":"+senderId+":"+senderName).getBytes();
 
             transactionData = new TransactionDto();
-            transactionData.setSenderID(2222);
-            transactionData.setSenderName("Pritesh");
+            transactionData.setSenderID(senderId);
+            transactionData.setSenderName(senderName);
             transactionData.setAmount(Double.parseDouble(data));
 
             OutputStream outputStream = socket.getOutputStream();
@@ -128,6 +134,7 @@ public class FileClientAsyncTask extends AsyncTask {
                     }
                 }
             }
+            activity.mobiles.clear();
             EventResponse eventResponse = new EventResponse(transactionData, EventNumbers.CLIENT_ASYNC_EVENT);
             RxBus rxBus=RxBus.getInstance();
             rxBus.send(eventResponse);
