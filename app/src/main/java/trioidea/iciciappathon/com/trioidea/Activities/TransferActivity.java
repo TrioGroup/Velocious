@@ -3,6 +3,7 @@ package trioidea.iciciappathon.com.trioidea.Activities;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
@@ -20,6 +21,9 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 
+import trioidea.iciciappathon.com.trioidea.DbHelper;
+import trioidea.iciciappathon.com.trioidea.EncryptionClass;
+import trioidea.iciciappathon.com.trioidea.Fragments.HistoryFragment;
 import trioidea.iciciappathon.com.trioidea.Fragments.SendMoneyFragment;
 import trioidea.iciciappathon.com.trioidea.Fragments.TransactionMainScreenFragment;
 import trioidea.iciciappathon.com.trioidea.R;
@@ -48,7 +52,10 @@ public class TransferActivity extends AppCompatActivity {
 
         getSupportActionBar().setTitle((Html.fromHtml("<font color=\"#000000\">" + getString(R.string.app_name) + "</font>")));
 
-        balance = 1000;
+       // SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("userData", MODE_PRIVATE);
+        //String balanceEncrypted = sharedPreferences.getString("balance", "00");
+        balance = DbHelper.getInstance(this).getBalance();
+        //balance= Double.parseDouble(EncryptionClass.symmetricDecrypt(balanceEncrypted));
         //textView = (TextView) findViewById(R.id.balance);
         //textView.setText( Double.toString(balance));
 
@@ -116,7 +123,7 @@ public class TransferActivity extends AppCompatActivity {
     }
 
     public void updateBalance() {
-        textView.setText(Double.toString(balance));
+        textView.setText(String.valueOf(DbHelper.getInstance(this).getBalance()));
     }
 
     public WifiP2pManager getManager() {
@@ -142,6 +149,14 @@ public class TransferActivity extends AppCompatActivity {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.container, transactionMainScreenFragment);
         fragmentTransaction.addToBackStack("TransactionScreen");
+        fragmentTransaction.commit();
+    }
+    public void startHistoryFragment() {
+        HistoryFragment historyFragment = new HistoryFragment();
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.container, historyFragment);
+        fragmentTransaction.addToBackStack("HistoryScreen");
         fragmentTransaction.commit();
     }
 

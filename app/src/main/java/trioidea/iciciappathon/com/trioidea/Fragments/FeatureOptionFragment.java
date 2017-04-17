@@ -20,7 +20,15 @@ import trioidea.iciciappathon.com.trioidea.R;
 public class FeatureOptionFragment extends Fragment {
 
     FeatureOptionFragmentController mController;
-    ImageButton shopping,offline;
+    ImageButton shopping;
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mController.subscription.unsubscribe();
+    }
+
+    ImageButton offline;
 
     @Nullable
     @Override

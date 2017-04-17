@@ -54,7 +54,7 @@ public class FileClientAsyncTask extends AsyncTask {
 
             SharedPreferences sharedPreferences = activity.getApplicationContext().getSharedPreferences("userData", 0);
             String senderName = EncryptionClass.symmetricDecrypt(sharedPreferences.getString("name", "User"));
-            int senderId = Integer.parseInt(EncryptionClass.symmetricDecrypt(sharedPreferences.getString("aadhar", "0000")));
+            long senderId = Long.parseLong(EncryptionClass.symmetricDecrypt(sharedPreferences.getString("account", "0000")));
 
             buf = EncryptionClass.symmetricEncrypt(data.trim()+":"+senderId+":"+senderName).getBytes();
 
@@ -79,7 +79,7 @@ public class FileClientAsyncTask extends AsyncTask {
                 activity.balance = activity.balance - Double.parseDouble(data);
                 Log.e("p2p", "Current balance" + activity.balance);
 
-                transactionData.setReceiverId(Integer.parseInt(receivedStrings[1]));
+                transactionData.setReceiverId(Long.parseLong(receivedStrings[1]));
                 transactionData.setReceiverName(receivedStrings[2]);
                 transactionData.setTime(receivedStrings[3]);
                 transactionData.setBalance(activity.balance);

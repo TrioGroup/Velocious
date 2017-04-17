@@ -56,7 +56,7 @@ public class TransactionMainScreenFragment extends Fragment implements Observer{
     TransactionDto transactionData;
     Subscription subscription;
     String receiverName;
-    int receiverId;
+    long receiverId;
 
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle savedInstanceState)
@@ -75,8 +75,19 @@ public class TransactionMainScreenFragment extends Fragment implements Observer{
     {
         parentActivity=(TransferActivity)TransactionMainScreenFragment.this.getActivity();
         parentActivity.textView = (TextView) parentActivity.findViewById(R.id.balance);
-        parentActivity.textView.setText( Double.toString(parentActivity.balance));
+        parentActivity.textView.setText(String.valueOf(parentActivity.balance));
 
+        getActivity().findViewById(R.id.btn_history).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ((TransferActivity)getActivity()).startHistoryFragment();
+                    }
+                });
+            }
+        });
         getActivity().findViewById(R.id.wifi_send).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -173,11 +184,11 @@ public class TransactionMainScreenFragment extends Fragment implements Observer{
 
                                                             SharedPreferences sharedPreferences = parentActivity.getApplicationContext().getSharedPreferences("userData", 0);
                                                             receiverName = EncryptionClass.symmetricDecrypt(sharedPreferences.getString("name", "User"));
-                                                            receiverId = Integer.parseInt(EncryptionClass.symmetricDecrypt(sharedPreferences.getString("aadhar","0000")));
+                                                            receiverId = Long.parseLong(EncryptionClass.symmetricDecrypt(sharedPreferences.getString("account","0000")));
                                                             transactionData.setAmount(Double.parseDouble(amount));
                                                             transactionData.setReceiverId(receiverId);
                                                             transactionData.setReceiverName(receiverName);
-                                                            transactionData.setSenderID(Integer.parseInt(receivedStrings[1]));
+                                                            transactionData.setSenderID(Long.parseLong(receivedStrings[1]));
                                                             transactionData.setSenderName(receivedStrings[2]);
                                                             transactionData.setTime(String.valueOf(now));
                                                             transactionData.setSyncFlag(false);
@@ -251,7 +262,7 @@ public class TransactionMainScreenFragment extends Fragment implements Observer{
                                                             }
                                                         }
                                                         parentActivity.mobiles.clear();
-                                                        EventResponse eventResponse = new EventResponse(0, EventNumbers.SERVER_ASYNC_EVENT);
+                                                        EventResponse eventResponse = new EventResponse(transactionData, EventNumbers.SERVER_ASYNC_EVENT);
                                                         return eventResponse;
                                                     }
 

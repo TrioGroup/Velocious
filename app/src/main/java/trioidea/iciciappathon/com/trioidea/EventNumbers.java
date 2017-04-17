@@ -16,4 +16,6 @@ public class EventNumbers {
     public static final int HISTORY_DATE_RANGE=10;
     public static final int SERVER_ASYNC_EVENT=11;
     public static final int CLIENT_ASYNC_EVENT=12;
+    public static final int CHECK_TRANSACTION_EVENT=13;
+
 }

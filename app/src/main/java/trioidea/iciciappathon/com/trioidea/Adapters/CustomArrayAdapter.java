@@ -1,4 +1,4 @@
-package trioidea.iciciappathon.com.trioidea;
+package trioidea.iciciappathon.com.trioidea.Adapters;
 
 import android.widget.ArrayAdapter;
 import android.app.Activity;
@@ -7,6 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import trioidea.iciciappathon.com.trioidea.R;
+
 /**
  * Created by Harshal on 14-Apr-17.
  */

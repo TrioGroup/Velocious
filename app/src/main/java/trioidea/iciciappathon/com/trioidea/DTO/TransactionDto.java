@@ -5,9 +5,9 @@ package trioidea.iciciappathon.com.trioidea.DTO;
  */
 public class TransactionDto  {
     int transactionId;
-    int senderID;
+    long senderID;
     String senderName;
-    int receiverId;
+    long receiverId;
     String receiverName;
     double amount;
     String time;
@@ -16,7 +16,7 @@ public class TransactionDto  {
 
     public TransactionDto()
     {    }
-    public TransactionDto(int transactionId, int senderID, String senderName, int receiverId, String receiverName, double amount, String time, double balance, boolean syncFlag) {
+    public TransactionDto(int transactionId, long senderID, String senderName, long receiverId, String receiverName, double amount, String time, double balance, boolean syncFlag) {
         this.transactionId = transactionId;
         this.senderID = senderID;
         this.senderName = senderName;
@@ -44,11 +44,11 @@ public class TransactionDto  {
         this.transactionId = transactionId;
     }
 
-    public int getSenderID() {
+    public long getSenderID() {
         return senderID;
     }
 
-    public void setSenderID(int senderID) {
+    public void setSenderID(long senderID) {
         this.senderID = senderID;
     }
 
@@ -60,11 +60,11 @@ public class TransactionDto  {
         this.senderName = senderName;
     }
 
-    public int getReceiverId() {
+    public long getReceiverId() {
         return receiverId;
     }
 
-    public void setReceiverId(int receiverId) {
+    public void setReceiverId(long receiverId) {
         this.receiverId = receiverId;
     }
 

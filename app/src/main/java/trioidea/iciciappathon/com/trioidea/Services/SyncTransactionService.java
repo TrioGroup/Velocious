@@ -28,9 +28,11 @@ import java.util.concurrent.Callable;
 
 import rx.Observable;
 import rx.Observer;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import trioidea.iciciappathon.com.trioidea.DTO.AuthenticateDto;
+import trioidea.iciciappathon.com.trioidea.DTO.CheckTransactionDTO;
 import trioidea.iciciappathon.com.trioidea.DTO.FundTransferDto;
 import trioidea.iciciappathon.com.trioidea.DTO.TransactionDto;
 import trioidea.iciciappathon.com.trioidea.DbHelper;
@@ -47,10 +49,11 @@ public class SyncTransactionService extends Service implements Observer {
     static int count = 0;
     RxBus rxBus = RxBus.getInstance();
     Intent intent;
+    Subscription subscription;
 
     public SyncTransactionService() {
         super();
-        rxBus.toObserverable().subscribeOn(Schedulers.computation()).observeOn(Schedulers.computation()).subscribe(this);
+        subscription = rxBus.toObserverable().subscribeOn(Schedulers.computation()).observeOn(Schedulers.computation()).subscribe(this);
     }
 
     @Override
@@ -103,16 +106,14 @@ public class SyncTransactionService extends Service implements Observer {
                 });
                 observable.subscribeOn(Schedulers.io()).observeOn(Schedulers.computation()).subscribe(SyncTransactionService.this);
                 // serviceLayer.f
-            }
-            else
-            {
+            } else {
                 TransactionDto[] transactionDtos = null;
                 transactionDtos = DbHelper.getInstance(getApplicationContext()).getNotSyncedTransaction();
                 SharedPreferences.Editor editor = getApplicationContext().getSharedPreferences("userData", Context.MODE_PRIVATE).edit();
-                editor.putString("tokenId",tokenId);
+                editor.putString("tokenId", tokenId);
                 editor.commit();
                 checkHistoryToSync(transactionDtos);
-                ServiceLayer.getServiceLayer().fundTransfer(transactionDtos);
+                ServiceLayer.getServiceLayer().checkTransactionOnServer(transactionDtos);
             }
         }
         return START_STICKY;
@@ -134,13 +135,15 @@ public class SyncTransactionService extends Service implements Observer {
 
     }
 
-    public void checkHistoryToSync(TransactionDto[] transactionDtos)
-    {
+    public void checkHistoryToSync(TransactionDto[] transactionDtos) {
 
 
     }
+
     @Override
     public void onTaskRemoved(Intent rootIntent) {
+        if (!subscription.isUnsubscribed())
+            subscription.unsubscribe();
         Intent restartServiceTask = new Intent(getApplicationContext(), this.getClass());
         restartServiceTask.setPackage(getPackageName());
         PendingIntent restartPendingIntent = PendingIntent.getService(getApplicationContext(), 1, restartServiceTask, PendingIntent.FLAG_ONE_SHOT);
@@ -156,6 +159,8 @@ public class SyncTransactionService extends Service implements Observer {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        if (!subscription.isUnsubscribed())
+            subscription.unsubscribe();
         Intent broadcastIntent = new Intent("android.net.conn.CONNECTIVITY_CHANGE");
         sendBroadcast(broadcastIntent);
     }
@@ -201,11 +206,18 @@ public class SyncTransactionService extends Service implements Observer {
                 TransactionDto[] transactionDtos = null;
                 transactionDtos = DbHelper.getInstance(getApplicationContext()).getNotSyncedTransaction();
                 SharedPreferences.Editor editor = getApplicationContext().getSharedPreferences("userData", Context.MODE_PRIVATE).edit();
-                editor.putString("tokenId",authenticateDtoArrayList.get(0).getToken());
+                editor.putString("tokenId", authenticateDtoArrayList.get(0).getToken());
                 editor.commit();
                 checkHistoryToSync(transactionDtos);
-                ServiceLayer.getServiceLayer().fundTransfer(transactionDtos);
+                ServiceLayer.getServiceLayer().setTokenId(authenticateDtoArrayList.get(0).getToken());
+                ServiceLayer.getServiceLayer().checkTransactionOnServer(transactionDtos);
+                break;
+            case EventNumbers.CHECK_TRANSACTION_EVENT:
+                ArrayList<TransactionDto> transactionDtos1 = (ArrayList<TransactionDto>) ((EventResponse) o).getResponse();
+                Log.e("Event Authenticate user", ""+transactionDtos1.get(0).isSyncFlag());
+                ServiceLayer.getServiceLayer().fundTransfer((TransactionDto[]) transactionDtos1.toArray());
                 break;
         }
+
     }
 }

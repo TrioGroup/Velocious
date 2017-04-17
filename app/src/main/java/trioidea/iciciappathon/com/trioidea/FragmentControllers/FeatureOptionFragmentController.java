@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import rx.Observer;
+import rx.Subscription;
 import trioidea.iciciappathon.com.trioidea.Activities.MainScreen;
 import trioidea.iciciappathon.com.trioidea.DTO.AllUsersInfoDTO;
 import trioidea.iciciappathon.com.trioidea.DTO.AuthenticateDto;
@@ -35,13 +36,14 @@ import trioidea.iciciappathon.com.trioidea.Services.ServiceLayer;
 public class FeatureOptionFragmentController implements Observer, View.OnClickListener {
     FeatureOptionFragment featureOptionFragment;
     String temp = null;
+    public Subscription subscription;
     AllUsersInfoDTO allUsersInfoDTO=null;
     RxBus rxBus;
 
     public FeatureOptionFragmentController(FeatureOptionFragment fragment) {
         featureOptionFragment = fragment;
         rxBus = RxBus.getInstance();
-        rxBus.toObserverable().subscribe(this);
+        subscription=rxBus.toObserverable().subscribe(this);
     }
 
     @Override

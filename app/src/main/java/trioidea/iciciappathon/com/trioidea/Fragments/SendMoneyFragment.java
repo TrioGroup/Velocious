@@ -2,10 +2,13 @@ package trioidea.iciciappathon.com.trioidea.Fragments;
 
 import android.app.Fragment;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +25,7 @@ import rx.Subscription;
 import trioidea.iciciappathon.com.trioidea.Activities.TransferActivity;
 import trioidea.iciciappathon.com.trioidea.DTO.TransactionDto;
 import trioidea.iciciappathon.com.trioidea.DbHelper;
+import trioidea.iciciappathon.com.trioidea.EncryptionClass;
 import trioidea.iciciappathon.com.trioidea.EventNumbers;
 import trioidea.iciciappathon.com.trioidea.EventResponse;
 import trioidea.iciciappathon.com.trioidea.R;
@@ -52,8 +56,9 @@ public class SendMoneyFragment extends Fragment implements Observer
     {
         parentActivity=(TransferActivity)SendMoneyFragment.this.getActivity();
 
+
         parentActivity.textView = (TextView) parentActivity.findViewById(R.id.balance);
-        parentActivity.textView.setText( Double.toString(parentActivity.balance));
+        parentActivity.textView.setText(String.valueOf(DbHelper.getInstance(getActivity()).getBalance()));
 
         parentActivity.adapter = new ArrayAdapter(parentActivity, R.layout.activity_listview, parentActivity.mobiles);
         parentActivity.listView= (ListView) parentActivity.findViewById(R.id.mobile_list);

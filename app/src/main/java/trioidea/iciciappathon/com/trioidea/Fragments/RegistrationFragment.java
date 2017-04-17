@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -14,6 +15,10 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 import trioidea.iciciappathon.com.trioidea.Activities.MainScreen;
+import trioidea.iciciappathon.com.trioidea.DTO.AllUsersInfoDTO;
+import trioidea.iciciappathon.com.trioidea.DTO.BankAccountSummaryDTO;
+import trioidea.iciciappathon.com.trioidea.DTO.TransactionDto;
+import trioidea.iciciappathon.com.trioidea.DbHelper;
 import trioidea.iciciappathon.com.trioidea.EncryptionClass;
 import trioidea.iciciappathon.com.trioidea.FragmentControllers.RegistrationFragmentController;
 import trioidea.iciciappathon.com.trioidea.R;
@@ -28,14 +33,20 @@ public class RegistrationFragment extends Fragment {
     EditText etName, etAddress, etPhoneNumber, etAadhar, etCard;
     TextInputLayout tilName, tilAddress, tilPhoneNumber, tilAadhar, tilCard;
     ImageButton register;
+    double balance;
+    AllUsersInfoDTO allUsersInfoDTO;
     RegistrationFragmentController registrationFragmentController;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.registration, container, false);
-    }
 
+    }
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        //   super.onSaveInstanceState(outState);
+    }
     @Override
     public void onResume() {
         super.onResume();
@@ -44,7 +55,11 @@ public class RegistrationFragment extends Fragment {
         ((MainScreen)getActivity()).changeTitle("Register");
         resetUi();
     }
-
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        registrationFragmentController.subscription.unsubscribe();
+    }
     public void init() {
         etName = (EditText) RegistrationFragment.this.getActivity().findViewById(R.id.et_name);
         //etName.addTextChangedListener(this);
@@ -122,15 +137,19 @@ public class RegistrationFragment extends Fragment {
         tilAadhar.setErrorEnabled(false);
         tilCard.setErrorEnabled(false);
     }
-    public void setDataInSharedPref()
+    public void setDataInSharedPref(BankAccountSummaryDTO bankAccountSummaryDTO)
     {
         SharedPreferences.Editor editor = this.getActivity().getSharedPreferences("userData", Context.MODE_PRIVATE).edit();
         editor.putString("name", EncryptionClass.symmetricEncrypt(etName.getText().toString()));
         editor.putString("address",EncryptionClass.symmetricEncrypt(etAddress.getText().toString()));
         editor.putString("phone",EncryptionClass.symmetricEncrypt(etPhoneNumber.getText().toString()));
-        editor.putString("aadhar",EncryptionClass.symmetricEncrypt(etAadhar.getText().toString()));
+        editor.putString("account",EncryptionClass.symmetricEncrypt(etAadhar.getText().toString()));
         editor.putString("card",EncryptionClass.symmetricEncrypt(etCard.getText().toString()));
         editor.putBoolean("registered",true);
+        editor.putString("cust_id",EncryptionClass.symmetricEncrypt(String.valueOf(bankAccountSummaryDTO.getCustid())));
+        TransactionDto transactionDto=new TransactionDto(0,0,"Bank",Long.parseLong(etAadhar.getText().toString()),etName.getText().toString(),0, String.valueOf(System.currentTimeMillis()),bankAccountSummaryDTO.getBalance(),true);
+        DbHelper.getInstance(this.getActivity()).insertTransaction(transactionDto);
+        //editor.putString("balance",EncryptionClass.symmetricEncrypt(String.valueOf(bankAccountSummaryDTO.getBalance())));
         editor.commit();
     }
     private void addTextWatcher(final TextInputLayout textInputLayout)
@@ -151,6 +170,17 @@ public class RegistrationFragment extends Fragment {
 
             }
         });
+    }
+    public String getAccountNumber()
+    {
+        return etAadhar.getText().toString();
+    }
+    public double getBalance() {
+        return balance;
+    }
+
+    public void setBalance(double balance) {
+        this.balance = balance;
     }
 }
 

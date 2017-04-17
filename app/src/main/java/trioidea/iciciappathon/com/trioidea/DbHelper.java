@@ -86,9 +86,9 @@ public class DbHelper extends SQLiteOpenHelper {
     public TransactionDto[] getAllTransaction() {
         String selectQuery = "SELECT * FROM transactions;";
         int transactionId;
-        int senderID;
+        long senderID;
         String senderName;
-        int receiverId;
+        long receiverId;
         String receiverName;
         double amount;
         String time;
@@ -111,9 +111,9 @@ public class DbHelper extends SQLiteOpenHelper {
                 /*transactionId = Integer.parseInt((cursor.getString(0)));
                 senderID = Integer.parseInt((cursor.getString(1)));*/
                transactionId =cursor.getInt(0);
-                senderID = Integer.parseInt(EncryptionClass.symmetricDecrypt(cursor.getString(1)));
+                senderID = Long.parseLong(EncryptionClass.symmetricDecrypt(cursor.getString(1)));
                 senderName = EncryptionClass.symmetricDecrypt(cursor.getString(2));
-                receiverId = Integer.parseInt(EncryptionClass.symmetricDecrypt(cursor.getString(3)));
+                receiverId = Long.parseLong(EncryptionClass.symmetricDecrypt(cursor.getString(3)));
                 receiverName = EncryptionClass.symmetricDecrypt(cursor.getString(4));
                 amount = Double.parseDouble(EncryptionClass.symmetricDecrypt(cursor.getString(5)));
                 time = EncryptionClass.symmetricDecrypt(cursor.getString(6));
@@ -193,6 +193,19 @@ public class DbHelper extends SQLiteOpenHelper {
         return transactionDtosToPass;
     }
 
+    public double getBalance()
+    {
+        String selectQuery = "SELECT balance FROM transactions ORDER BY t_id DESC LIMIT 1;";
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        cursor.moveToFirst();
+        int count = cursor.getCount();
+        double bal=Double.parseDouble(EncryptionClass.symmetricDecrypt(cursor.getString(0)));
+        TransactionDto[] transactionDtos=getAllTransaction();
+        if(count>0)
+           return Double.parseDouble(EncryptionClass.symmetricDecrypt(cursor.getString(0)));
+        else
+            return 0;
+    }
     public void markSynced(TransactionDto transactionDto) {
         //String selectQuery = "UPDATE transactions SET sync_flag=\""+transactionDto.isSyncFlag()+"\" WHERE t_id=\""+transactionDto.getTransactionId()+"\";";
         ContentValues values = new ContentValues();
@@ -201,8 +214,4 @@ public class DbHelper extends SQLiteOpenHelper {
 
     }
 
-    public String getBalance()
-    {
-        return null;
-    }
 }
