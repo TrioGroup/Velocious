@@ -325,7 +325,13 @@ public class TransactionMainScreenFragment extends Fragment implements Observer{
                 TransactionDto[] transactionDtos=db.getAllTransaction();
                 for(int i=0;i<transactionDtos.length;i++)
                     Log.e("receiver","length:"+transactionDtos.length+" first:"+transactionDtos[i].getAmount());
-                subscription.unsubscribe();
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(subscription!=null)
+        subscription.unsubscribe();
     }
 }

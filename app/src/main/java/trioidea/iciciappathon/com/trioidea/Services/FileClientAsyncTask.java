@@ -109,7 +109,6 @@ public class FileClientAsyncTask extends AsyncTask {
                     try {
                         Log.e("p2p", "Closing Socket");
                         socket.close();
-                        activity.startTransactionScreenFragment();
                         activity.disconnect();
                         activity.mWifiP2pManager.requestGroupInfo(activity.mChannel, new WifiP2pManager.GroupInfoListener() {
                             @Override

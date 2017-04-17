@@ -131,6 +131,12 @@ public class SendMoneyFragment extends Fragment implements Observer
         super.onPause();
         parentActivity.unregisterReceiver(parentActivity.mReceiver);
     }
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+        this.subscription.unsubscribe();
+    }
 
     @Override
     public void onCompleted() {
@@ -163,8 +169,7 @@ public class SendMoneyFragment extends Fragment implements Observer
                 Log.e("p2p","Entry Made");
                 for(int i=0;i<transactionDtos.length;i++)
                 Log.e("sender done","length:"+transactionDtos.length+" first:"+transactionDtos[i].getAmount());
-                subscription.unsubscribe();
-
+                getActivity().getFragmentManager().popBackStack();
         }
     }
 }
