@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -21,29 +22,30 @@ import trioidea.iciciappathon.com.trioidea.EventResponse;
  */
 public class CheckTransactionWS {
     public EventResponse checkOnServer(TransactionDto[] transactionDtos) {
-        TransactionDto[] transactionDtos1 = new TransactionDto[transactionDtos.length];
         try {
-            for (int i = 0; i < transactionDtos.length; i++) {
-                String response = WebService.getJSON("http://velocious.epizy.com/index.php/welcome/check?time=" + transactionDtos[i].getTime() + "&sender=" + transactionDtos[i].getSenderID() + "&receiver=" + transactionDtos[i].getReceiverId());
+            for (int i = 0; i < transactionDtos.length - 1; i++) {
+                String response = WebService.getJSON("http://appathon.16mb.com/index.php/welcome/check?time=" + transactionDtos[i].getTime() + "&sender=" + transactionDtos[i].getSenderID() + "&receiver=" + transactionDtos[i].getReceiverId());
                 Gson gson = new Gson();
-                JSONArray jsonArray = new JSONArray(response);
+                JSONObject jsonArray = new JSONObject(response);
                    /* Type type = new TypeToken<List<PostsDto>>() {
                     }.getType();
                     ArrayList<PostsDto> postsDto = gson.fromJson(jsonArray.toString(), type);
                     return postsDto;*/
-                Type type = new TypeToken<ArrayList<CheckTransactionDTO>>() {
+                Type type = new TypeToken<CheckTransactionDTO>() {
                 }.getType();
                 Log.e("Balance enquiry", jsonArray.toString());
-                ArrayList<CheckTransactionDTO> checkTransactionDTOArrayList = gson.fromJson(jsonArray.toString(), type);
-                if(!transactionDtos1[i].isSyncFlag() && checkTransactionDTOArrayList.get(0).getStatus().equalsIgnoreCase("success"))
-                {
-                    transactionDtos1[i].setSyncFlag(true);
+                CheckTransactionDTO checkTransactionDTOArrayList = gson.fromJson(jsonArray.toString(), type);
+                if (!transactionDtos[i].isSyncFlag() && checkTransactionDTOArrayList.getStatus().equalsIgnoreCase("success")) {
+                    if (checkTransactionDTOArrayList.getData().equalsIgnoreCase("1"))
+                        transactionDtos[i].setSyncFlag(true);
+                    else
+                        transactionDtos[i].setSyncFlag(false);
                 }
             }
         } catch (Exception e) {
             return null;
         }
-        EventResponse eventResponse = new EventResponse((Object) transactionDtos1, EventNumbers.CHECK_TRANSACTION_EVENT);
+        EventResponse eventResponse = new EventResponse((Object) transactionDtos, EventNumbers.CHECK_TRANSACTION_EVENT);
         return eventResponse;
     }
 

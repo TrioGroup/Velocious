@@ -254,8 +254,8 @@ public class ServiceLayer implements Observer {
                     rxBus.send((EventResponse) o);
                     break;
                 case EventNumbers.CHECK_TRANSACTION_EVENT:
-                    ArrayList<CheckTransactionDTO> checkTransactionDTOArrayList = (ArrayList<CheckTransactionDTO>) ((EventResponse) o).getResponse();
-                    Log.e("Event transaction", "" + checkTransactionDTOArrayList.get(0).getStatus());
+                    TransactionDto[] checkTransactionDTOArrayList = (TransactionDto[]) ((EventResponse) o).getResponse();
+                    Log.e("Event transaction", "" + checkTransactionDTOArrayList[0].getSenderID());
                     ((EventResponse) o).setEvent(EventNumbers.CHECK_TRANSACTION_EVENT);
                     rxBus.send((EventResponse) o);
                     break;

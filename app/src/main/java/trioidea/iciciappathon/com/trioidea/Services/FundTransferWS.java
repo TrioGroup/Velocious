@@ -24,7 +24,7 @@ public class FundTransferWS {
     public EventResponse fundTransfer(String userName, String token, TransactionDto[] transactionDtos) {
         FundTransferDto[] fundTransferDtos = new FundTransferDto[transactionDtos.length];
         for (int i = 0; i < transactionDtos.length; i++) {
-            String response = WebService.getJSON("https://retailbanking.mybluemix.net/banking/icicibank/fundTransfer?client_id=" + userName + "&token=" + token + "&srcAccount=" + transactionDtos[i].getSenderID() + "&destAccount=" + transactionDtos[i].getReceiverId() + "&amt=" + transactionDtos[i].getAmount());
+            String response = WebService.getJSON("https://retailbanking.mybluemix.net/banking/icicibank/fundTransfer?client_id=" + userName + "&token=" + token + "&srcAccount=" + transactionDtos[i].getSenderID() + "&destAccount=" + transactionDtos[i].getReceiverId() + "&amt=" + transactionDtos[i].getAmount()+"&payeeDesc=NA"+"&payeeId=1"+"&type_of_trancsaction=PMR");
             Gson gson = new Gson();
             try {
                 JSONArray jsonArray = new JSONArray(response);

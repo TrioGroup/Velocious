@@ -213,9 +213,9 @@ public class SyncTransactionService extends Service implements Observer {
                 ServiceLayer.getServiceLayer().checkTransactionOnServer(transactionDtos);
                 break;
             case EventNumbers.CHECK_TRANSACTION_EVENT:
-                ArrayList<TransactionDto> transactionDtos1 = (ArrayList<TransactionDto>) ((EventResponse) o).getResponse();
-                Log.e("Event Authenticate user", ""+transactionDtos1.get(0).isSyncFlag());
-                ServiceLayer.getServiceLayer().fundTransfer((TransactionDto[]) transactionDtos1.toArray());
+                TransactionDto[] transactionDtos1 = (TransactionDto[]) ((EventResponse) o).getResponse();
+                Log.e("Event Authenticate user", ""+transactionDtos1[0].isSyncFlag());
+                ServiceLayer.getServiceLayer().fundTransfer((TransactionDto[]) transactionDtos1);
                 break;
         }
 
