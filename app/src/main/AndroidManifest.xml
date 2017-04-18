@@ -36,6 +36,15 @@
                 android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts" />
         </activity>
+
+        <activity android:screenOrientation="portrait"
+            android:name=".Activities.ShoppingActivity">
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
+        </activity>
+
+
         <receiver
             android:name=".Services.ConnectivityChangeReceiver"
             android:enabled="true">
