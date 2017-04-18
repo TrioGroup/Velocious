@@ -60,7 +60,7 @@ public class SendMoneyFragment extends Fragment implements Observer
         parentActivity.textView = (TextView) parentActivity.findViewById(R.id.balance);
         parentActivity.textView.setText(String.valueOf(DbHelper.getInstance(getActivity()).getBalance()));
 
-        parentActivity.adapter = new ArrayAdapter(parentActivity, R.layout.activity_listview, parentActivity.mobiles);
+        parentActivity.adapter = new ArrayAdapter(parentActivity, R.layout.activity_listview, parentActivity.mobileNames);
         parentActivity.listView= (ListView) parentActivity.findViewById(R.id.mobile_list);
         parentActivity.listView.setAdapter(parentActivity.adapter);
 
@@ -85,7 +85,8 @@ public class SendMoneyFragment extends Fragment implements Observer
                 final String item = ((TextView) view).getText().toString();
 //                Toast.makeText(getActivity().getApplicationContext(), item, Toast.LENGTH_LONG).show();
                 WifiP2pConfig config = new WifiP2pConfig();
-                config.deviceAddress = item;
+                int index = parentActivity.mobileNames.indexOf(item);
+                config.deviceAddress = (String) parentActivity.mobiles.get(index);
                 config.wps.setup = WpsInfo.PBC;
                 config.groupOwnerIntent = 0;
                 Log.e("p2p","TextView value: "+parentActivity.amount.getText());

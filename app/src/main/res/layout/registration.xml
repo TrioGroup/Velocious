@@ -148,7 +148,7 @@
                     android:layout_height="wrap_content"
                     android:hint="Account number *"
                     android:inputType="number"
-                    android:text="4444777755551793"
+                    android:text=""
                     android:maxLength="16"
                     android:maxLines="1"
                     android:singleLine="true"

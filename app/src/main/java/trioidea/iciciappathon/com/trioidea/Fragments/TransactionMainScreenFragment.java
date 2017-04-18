@@ -261,6 +261,7 @@ public class TransactionMainScreenFragment extends Fragment implements Observer{
                                                                 }
                                                             }
                                                         }
+                                                        parentActivity.mobileNames.clear();
                                                         parentActivity.mobiles.clear();
                                                         EventResponse eventResponse = new EventResponse(transactionData, EventNumbers.SERVER_ASYNC_EVENT);
                                                         return eventResponse;

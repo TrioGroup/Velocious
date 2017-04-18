@@ -72,6 +72,11 @@ public class MainScreen extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void startActivityShopping() {
+        Intent intent = new Intent(this, ShoppingActivity.class);
+        startActivity(intent);
+    }
+
     public void changeTitle(String title)
     {
         getSupportActionBar().setTitle((Html.fromHtml("<font color=\"#000000\">" + title + "</font>")));

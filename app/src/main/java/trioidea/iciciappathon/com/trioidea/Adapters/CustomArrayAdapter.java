@@ -16,17 +16,17 @@ import trioidea.iciciappathon.com.trioidea.R;
 public class CustomArrayAdapter extends ArrayAdapter<String> {
 
     private String[] names;
-    private String[] desc;
-    private String[] site;
+    private String[] make;
+    private String[] price;
     private Integer[] imageid;
     private Activity context;
 
-    public CustomArrayAdapter(Activity context, String[] names, String[] desc,String[] site, Integer[] imageid) {
-        super(context, R.layout.shopping_list_item, names);
+    public CustomArrayAdapter(Activity context, String[] names, String[] make, String[] price, Integer[] imageid) {
+        super(context, R.layout.listview, names);
         this.context = context;
         this.names = names;
-        this.desc = desc;
-        this.site = site;
+        this.make = make;
+        this.price = price;
         this.imageid = imageid;
 
     }
@@ -34,16 +34,16 @@ public class CustomArrayAdapter extends ArrayAdapter<String> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = context.getLayoutInflater();
-        View listViewItem = inflater.inflate(R.layout.shopping_list_item, null, true);
-        TextView textViewName = (TextView) listViewItem.findViewById(R.id.textViewName);
-        TextView textViewDesc = (TextView) listViewItem.findViewById(R.id.textViewDesc);
-        TextView textViewsite = (TextView) listViewItem.findViewById(R.id.textViewsite);
-        ImageView image = (ImageView) listViewItem.findViewById(R.id.imageView);
+        View listViewItem = inflater.inflate(R.layout.listview, null, true);
+        TextView carName = (TextView) listViewItem.findViewById(R.id.car_name);
+        TextView carMake = (TextView) listViewItem.findViewById(R.id.car_make);
+        TextView carPrice = (TextView) listViewItem.findViewById(R.id.car_price);
+        ImageView carImage = (ImageView) listViewItem.findViewById(R.id.car_image);
 
-        textViewName.setText(names[position]);
-        textViewDesc.setText(desc[position]);
-        textViewsite.setText(site[position]);
-        image.setImageResource(imageid[position]);
+        carName.setText(names[position]);
+        carMake.setText(make[position]);
+        carPrice.setText(price[position]);
+        carImage.setImageResource(imageid[position]);
         return  listViewItem;
     }
 }

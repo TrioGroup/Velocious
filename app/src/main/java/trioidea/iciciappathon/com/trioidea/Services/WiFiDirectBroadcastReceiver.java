@@ -99,10 +99,13 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 Iterator<WifiP2pDevice> iterator= deviceList.iterator();
                 while(iterator.hasNext()!=false)
                 {
+                    mActivity.mobiles.clear();
+                    mActivity.mobileNames.clear();
                     WifiP2pDevice device = iterator.next();
 //                    Log.e("p2p", "device  = " + device.toString());
-                    if (mActivity.mobiles.contains(device.deviceAddress) == false)
+                    if (mActivity.mobiles.contains(device.deviceAddress) == false && mActivity.mobileNames.contains(device.deviceName) == false )
                     {
+                        mActivity.mobileNames.add(device.deviceName);
                         mActivity.mobiles.add(device.deviceAddress);
                         if(mActivity.adapter != null)
                             mActivity.adapter.notifyDataSetChanged();

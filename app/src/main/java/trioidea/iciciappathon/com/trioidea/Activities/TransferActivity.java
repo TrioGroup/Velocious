@@ -39,7 +39,8 @@ public class TransferActivity extends AppCompatActivity {
     public TextView textView;
     public ArrayAdapter adapter;
     public EditText amount;
-    public List mobiles = mobiles = new ArrayList();
+    public List mobiles  = new ArrayList();
+    public List mobileNames  = new ArrayList();
     public boolean isSender = false;
     public InetAddress address;
     public double balance;

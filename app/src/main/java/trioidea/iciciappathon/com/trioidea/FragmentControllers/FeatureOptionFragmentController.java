@@ -111,39 +111,7 @@ public class FeatureOptionFragmentController implements Observer, View.OnClickLi
                 break;
             case R.id.btn_shopping_assist:
                 //"t_id", "sender_id", "sender_name", "receiver_id", "receiver_name", "amount", "time", "balance", "sync_flag"
-                TransactionDto transactionDto1 = new TransactionDto(1, 1, "sender", 2, "receiver", 2000, "12.00", 10000, false);
-                DbHelper.getInstance(featureOptionFragment.getActivity()).insertTransaction(transactionDto1);
-
-                TransactionDto transactionDto2 = new TransactionDto(2, 1, "sender", 2, "receiver", 2000, "12.00", 10000, false);
-                DbHelper.getInstance(featureOptionFragment.getActivity()).insertTransaction(transactionDto2);
-
-                TransactionDto transactionDto3 = new TransactionDto(3, 1, "sender", 2, "receiver", 2000, "12.00", 10000, false);
-                DbHelper.getInstance(featureOptionFragment.getActivity()).insertTransaction(transactionDto3);
-
-                TransactionDto transactionDto4 = new TransactionDto(4, 1, "sender", 2, "receiver", 2000, "12.00", 10000, false);
-                DbHelper.getInstance(featureOptionFragment.getActivity()).insertTransaction(transactionDto4);
-
-
-                TransactionDto[] transactionDtos = DbHelper.getInstance(featureOptionFragment.getActivity()).getAllTransaction();
-                if(transactionDtos!=null)
-                Log.e("DBTEST", "incontroller" + transactionDtos[0].getTransactionId());
-                ServiceLayer serviceLayer=ServiceLayer.getServiceLayer();
-                serviceLayer.autheticateUser();
-                serviceLayer.userInfo();
-
-
-                String timeSettings = android.provider.Settings.System.getString(featureOptionFragment.getActivity().getContentResolver(), android.provider.Settings.Global.AUTO_TIME);
-                if(timeSettings.equals("0"))
-                {
-                    Settings.System.putString(featureOptionFragment.getActivity().getContentResolver(), android.provider.Settings.Global.AUTO_TIME,"1");
-                 /*ntent intent = new Intent(Intent.ACTION_MAIN);
-                    intent.setClassName("com.android.settings", "com.android.settings.ACTION_DATE_SETTINGS");
-                    featureOptionFragment.getActivity().startActivity(intent);
-               */
-                    featureOptionFragment.getActivity().startActivityForResult(new Intent(android.provider.Settings.ACTION_DATE_SETTINGS), 0);
-                }
-                Date now=new Date(System.currentTimeMillis());
-                Log.e("Time ",now.toString());
+                ((MainScreen)featureOptionFragment.getActivity()).startActivityShopping();
                 break;
         }
     }
