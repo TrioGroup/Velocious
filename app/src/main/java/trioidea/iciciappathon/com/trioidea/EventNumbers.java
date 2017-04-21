@@ -17,5 +17,10 @@ public class EventNumbers {
     public static final int SERVER_ASYNC_EVENT=11;
     public static final int CLIENT_ASYNC_EVENT=12;
     public static final int CHECK_TRANSACTION_EVENT=13;
+    public static final int AMAZON_GET_PRODUCTS=14;
+    public static final int AMAZON_GET_ITEM=15;
+
+    //FRAGMENT EVENTS
+    public static final int START_ITEM_DETAILS_FRAGMENT=100;
 
 }
