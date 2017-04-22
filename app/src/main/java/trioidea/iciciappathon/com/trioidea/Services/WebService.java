@@ -57,5 +57,29 @@ public class WebService {
             }
         }
     }
+    public static String getXML(String url) {
+        String line = null;
+
+        try {
+
+            HttpURLConnection httpClient = null;
+            URL u = new URL(url);
+            httpClient = (HttpURLConnection) u.openConnection();
+
+            httpClient.setConnectTimeout(5000);
+            httpClient.setReadTimeout(5000);
+            httpClient.connect();
+            BufferedReader br = new BufferedReader(new InputStreamReader(httpClient.getInputStream()));
+            StringBuilder sb = new StringBuilder();
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+            }
+            br.close();
+            line= sb.toString();
+        } catch (Exception e) {
+            line = "Internet Connection Error >> " + e.getMessage();
+        }
+    return line;
+    }
 
 }

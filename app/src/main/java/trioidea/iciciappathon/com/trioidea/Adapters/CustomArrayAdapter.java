@@ -8,6 +8,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import trioidea.iciciappathon.com.trioidea.DTO.SingleItem;
 import trioidea.iciciappathon.com.trioidea.R;
 
 /**
@@ -15,18 +19,14 @@ import trioidea.iciciappathon.com.trioidea.R;
  */
 public class CustomArrayAdapter extends ArrayAdapter<String> {
 
-    private String[] names;
-    private String[] make;
-    private String[] price;
+    ArrayList<SingleItem> itemList;
     private Integer[] imageid;
     private Activity context;
 
-    public CustomArrayAdapter(Activity context, String[] names, String[] make, String[] price, Integer[] imageid) {
-        super(context, R.layout.listview, names);
+    public CustomArrayAdapter(Activity context, ArrayList<SingleItem> itemList,Integer[]imageid) {
+        super(context, R.layout.listview);
         this.context = context;
-        this.names = names;
-        this.make = make;
-        this.price = price;
+        this.itemList = itemList;
         this.imageid = imageid;
 
     }
@@ -40,9 +40,9 @@ public class CustomArrayAdapter extends ArrayAdapter<String> {
         TextView carPrice = (TextView) listViewItem.findViewById(R.id.car_price);
         ImageView carImage = (ImageView) listViewItem.findViewById(R.id.car_image);
 
-        carName.setText(names[position]);
-        carMake.setText(make[position]);
-        carPrice.setText(price[position]);
+        carName.setText(itemList.get(position).getItemAttributes().getTitle());
+        carMake.setText(itemList.get(position).getItemAttributes().getPublisher());
+        carPrice.setText(itemList.get(position).getItemAttributes().getListPrice().getFormattedPrice());
         carImage.setImageResource(imageid[position]);
         return  listViewItem;
     }

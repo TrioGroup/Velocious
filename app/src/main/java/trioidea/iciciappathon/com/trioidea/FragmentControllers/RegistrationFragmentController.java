@@ -112,12 +112,32 @@ public class RegistrationFragmentController implements View.OnClickListener, Obs
                     ArrayList<AllUsersInfoDTO> allUsersInfoDTOArrayList = (ArrayList<AllUsersInfoDTO>) ((EventResponse) o).getResponse();
                     Log.e("in controller", "" + allUsersInfoDTOArrayList.get(0).getAccount_no());
                     if (allUsersInfoDTOArrayList != null) {
-                        for (int i = 0; i < allUsersInfoDTOArrayList.size(); i++)
+                        for (int i = 0; i < allUsersInfoDTOArrayList.size(); i++) {
                             if (allUsersInfoDTOArrayList.get(i).getAccount_no() == Long.parseLong(registrationFragment.getAccountNumber())) {
-                                {
-                                    ServiceLayer.getServiceLayer().bankAccountSummary(allUsersInfoDTOArrayList.get(i));
-                                }
+                                ServiceLayer.getServiceLayer().bankAccountSummary(allUsersInfoDTOArrayList.get(i));
+                                flag1 = true;
                             }
+                        }
+                        if(!flag1)
+                        {
+                            registrationFragment.getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if(progressDialog!=null)
+                                    progressDialog.dismiss();
+                                    final AlertDialog alertDialog = new AlertDialog.Builder(registrationFragment.getActivity()).create();
+                                    alertDialog.setMessage("Could not verify your Account..");
+                                    alertDialog.setTitle("Alert");
+                                    alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Ok", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            alertDialog.dismiss();
+                                        }
+                                    });
+                                    alertDialog.show();
+                                }
+                            });
+                        }
 
                     } else {
                         registrationFragment.getActivity().runOnUiThread(new Runnable() {

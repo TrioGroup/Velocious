@@ -1,8 +1,13 @@
 package trioidea.iciciappathon.com.trioidea.FragmentControllers;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
@@ -10,6 +15,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import rx.Observer;
 import rx.Subscription;
@@ -28,6 +34,7 @@ import trioidea.iciciappathon.com.trioidea.Fragments.FeatureOptionFragment;
 import trioidea.iciciappathon.com.trioidea.Fragments.RegistrationFragment;
 import trioidea.iciciappathon.com.trioidea.R;
 import trioidea.iciciappathon.com.trioidea.RxBus;
+import trioidea.iciciappathon.com.trioidea.Services.ItemSearchAWS;
 import trioidea.iciciappathon.com.trioidea.Services.ServiceLayer;
 
 /**
@@ -39,6 +46,7 @@ public class FeatureOptionFragmentController implements Observer, View.OnClickLi
     public Subscription subscription;
     AllUsersInfoDTO allUsersInfoDTO=null;
     RxBus rxBus;
+    AlertDialog alertDialog;
 
     public FeatureOptionFragmentController(FeatureOptionFragment fragment) {
         featureOptionFragment = fragment;
@@ -111,7 +119,24 @@ public class FeatureOptionFragmentController implements Observer, View.OnClickLi
                 break;
             case R.id.btn_shopping_assist:
                 //"t_id", "sender_id", "sender_name", "receiver_id", "receiver_name", "amount", "time", "balance", "sync_flag"
-                ((MainScreen)featureOptionFragment.getActivity()).startActivityShopping();
+                ConnectivityManager connectivityManager = ((ConnectivityManager) featureOptionFragment.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE));
+                NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+                if (networkInfo != null && networkInfo.isAvailable() && networkInfo.isConnected()) {
+                    ((MainScreen) featureOptionFragment.getActivity()).startActivityShopping();
+                }
+                else
+                {
+                    alertDialog = new AlertDialog.Builder(featureOptionFragment.getActivity()).create();
+                    alertDialog.setMessage("Cannot connect to internet. Please try again later.");
+                    alertDialog.setTitle("Alert");
+                    alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            alertDialog.dismiss();
+                        }
+                    });
+                    alertDialog.show();
+                }
                 break;
         }
     }

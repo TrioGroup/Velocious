@@ -3,6 +3,7 @@ package trioidea.iciciappathon.com.trioidea.Services;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
+import android.widget.ArrayAdapter;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -18,6 +19,7 @@ import java.util.concurrent.Callable;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
+import rx.functions.Action0;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 import trioidea.iciciappathon.com.trioidea.DTO.AllUsersInfoDTO;
@@ -27,6 +29,8 @@ import trioidea.iciciappathon.com.trioidea.DTO.BankAccountSummaryDTO;
 import trioidea.iciciappathon.com.trioidea.DTO.CheckTransactionDTO;
 import trioidea.iciciappathon.com.trioidea.DTO.FundTransferDto;
 import trioidea.iciciappathon.com.trioidea.DTO.HistoryDateRangeDTO;
+import trioidea.iciciappathon.com.trioidea.DTO.ItemLookUpDto;
+import trioidea.iciciappathon.com.trioidea.DTO.SingleItem;
 import trioidea.iciciappathon.com.trioidea.DTO.TransactionDto;
 import trioidea.iciciappathon.com.trioidea.EventNumbers;
 import trioidea.iciciappathon.com.trioidea.EventResponse;
@@ -195,6 +199,40 @@ public class ServiceLayer implements Observer {
         observable.subscribeOn(Schedulers.io()).observeOn(Schedulers.computation()).subscribe(ServiceLayer.this);
     }
 
+    public void getItemsFromAmazon(final String searchItem,final int pageNo) {
+        final Observable observable = Observable.fromCallable(new Callable() {
+            @Override
+            public Object call() throws Exception {
+
+                ItemSearchAWS itemSearchAWS = new ItemSearchAWS();
+                EventResponse eventResponse = itemSearchAWS.getItem(searchItem,pageNo);
+                return eventResponse;
+            }
+        });
+        observable.subscribeOn(Schedulers.io()).observeOn(Schedulers.computation()).doOnCompleted(new Action0() {
+            @Override
+            public void call() {
+                observable.unsubscribeOn(Schedulers.io());
+            }
+        }).subscribe(ServiceLayer.this);
+    }
+    public void getItemDetails(final String itemASIN) {
+        final Observable observable = Observable.fromCallable(new Callable() {
+            @Override
+            public Object call() throws Exception {
+                ItemLookUp itemLookUp=new ItemLookUp();
+                EventResponse eventResponse = itemLookUp.getItem(itemASIN);
+                return eventResponse;
+            }
+        });
+        observable.subscribeOn(Schedulers.io()).observeOn(Schedulers.computation()).doOnCompleted(new Action0() {
+            @Override
+            public void call() {
+                observable.unsubscribeOn(Schedulers.io());
+            }
+        }).subscribe(ServiceLayer.this);
+    }
+
     @Override
     public void onCompleted() {
 
@@ -259,6 +297,19 @@ public class ServiceLayer implements Observer {
                     ((EventResponse) o).setEvent(EventNumbers.CHECK_TRANSACTION_EVENT);
                     rxBus.send((EventResponse) o);
                     break;
+                case EventNumbers.AMAZON_GET_PRODUCTS:
+                    ArrayList<SingleItem> singleItems = (ArrayList<SingleItem>) ((EventResponse) o).getResponse();
+                    Log.e("Event get Products", "" + singleItems.get(0).getASIN());
+                    ((EventResponse) o).setEvent(EventNumbers.AMAZON_GET_PRODUCTS);
+                    rxBus.send((EventResponse) o);
+                    break;
+                case EventNumbers.AMAZON_GET_ITEM:
+                    ItemLookUpDto singleItem = (ItemLookUpDto) ((EventResponse) o).getResponse();
+                    Log.e("Event get Products", "" + singleItem.getASIN());
+                    ((EventResponse) o).setEvent(EventNumbers.AMAZON_GET_ITEM);
+                    rxBus.send((EventResponse) o);
+                    break;
             }
+
     }
 }
