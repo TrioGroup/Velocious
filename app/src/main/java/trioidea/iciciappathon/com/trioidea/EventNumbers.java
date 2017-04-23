@@ -20,6 +20,8 @@ public class EventNumbers {
     public static final int AMAZON_GET_PRODUCTS=14;
     public static final int AMAZON_GET_ITEM=15;
     public static final int FLIPKART_GET_ITEM=16;
+    public static final int ENTER_PASSKEY=17;
+
 
 
     //FRAGMENT EVENTS
