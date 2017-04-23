@@ -11,7 +11,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -102,6 +104,14 @@ public class ItemDetailsFragment extends Fragment implements Observer {
     @Override
     public void onResume() {
         super.onResume();
+        ImageButton addToCart=(ImageButton)getActivity().findViewById(R.id.fab);
+        addToCart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getActivity(),"Item added to cart",Toast.LENGTH_LONG).show();
+                ((ShoppingActivity)getActivity()).addItemListDTOArrayList(((ShoppingActivity) getActivity()).getSelectedItem());
+            }
+        });
         ItemListDTO singleItem = ((ShoppingActivity) getActivity()).getSelectedItem();
         if (singleItem.getSite().equals("Amazon"))
             ServiceLayer.getServiceLayer().getItemDetails(singleItem.getId());

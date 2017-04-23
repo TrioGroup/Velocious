@@ -11,6 +11,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Log;
 
+import java.util.ArrayList;
+
 import rx.Observer;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -19,6 +21,7 @@ import trioidea.iciciappathon.com.trioidea.DTO.ItemListDTO;
 import trioidea.iciciappathon.com.trioidea.DTO.SingleItem;
 import trioidea.iciciappathon.com.trioidea.EventNumbers;
 import trioidea.iciciappathon.com.trioidea.EventResponse;
+import trioidea.iciciappathon.com.trioidea.Fragments.CartFragment;
 import trioidea.iciciappathon.com.trioidea.Fragments.ItemDetailsFragment;
 import trioidea.iciciappathon.com.trioidea.Fragments.ShoppingMainScreenFragment;
 import trioidea.iciciappathon.com.trioidea.R;
@@ -30,22 +33,36 @@ import trioidea.iciciappathon.com.trioidea.RxBus;
 public class ShoppingActivity extends AppCompatActivity implements Observer {
     ProgressDialog progressDialog;
     AlertDialog alertDialog;
-    private ItemListDTO selectedItem;
     Subscription subscription;
-    RxBus rxBus=RxBus.getInstance();
+    RxBus rxBus = RxBus.getInstance();
+    ArrayList<ItemListDTO> itemListDTOArrayList;
+    private ItemListDTO selectedItem;
+
+    public ArrayList<ItemListDTO> getItemListDTOArrayList() {
+        return itemListDTOArrayList;
+    }
+
+    public void setItemListDTOArrayList(ArrayList<ItemListDTO> itemListDTOArrayList) {
+        this.itemListDTOArrayList = itemListDTOArrayList;
+    }
+
+    public void addItemListDTOArrayList(ItemListDTO itemListDTO) {
+        this.itemListDTOArrayList.add(itemListDTO);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //getSupportActionBar().setTitle((Html.fromHtml("<font color=\"#000000\">" + getString(R.string.app_name) + "</font>")));
-        subscription=rxBus.toObserverable().observeOn(Schedulers.io()).subscribeOn(AndroidSchedulers.mainThread()).subscribe(this);
+        subscription = rxBus.toObserverable().observeOn(Schedulers.io()).subscribeOn(AndroidSchedulers.mainThread()).subscribe(this);
     }
 
 
     @Override
     public void onResume() {
         super.onResume();
+        itemListDTOArrayList = new ArrayList<ItemListDTO>();
         startShoppingFragment();
     }
 
@@ -130,10 +147,15 @@ public class ShoppingActivity extends AppCompatActivity implements Observer {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            replaceFragment(new ItemDetailsFragment(),true);
+                            replaceFragment(new ItemDetailsFragment(), true);
                         }
                     });
                     break;
             }
     }
+    public void showCart()
+    {
+        replaceFragment(new CartFragment(),true);
+    }
+
 }

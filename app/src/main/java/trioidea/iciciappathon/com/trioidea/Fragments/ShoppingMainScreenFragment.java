@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -51,6 +52,7 @@ public class ShoppingMainScreenFragment extends Fragment implements MaterialSear
     CustomListViewAdapter customListViewAdapter;
     ListView listView;
     Subscription subscription;
+    ImageButton showCart;
     RxBus rxBus = RxBus.getInstance();
     int paginationPageNo = 1;
     String searchString;
@@ -77,6 +79,13 @@ public class ShoppingMainScreenFragment extends Fragment implements MaterialSear
         super.onResume();
         this.setRetainInstance(true);
         listView = (ListView) getActivity().findViewById(R.id.searchedItem);
+        showCart=(ImageButton)getActivity().findViewById(R.id.show_cart);
+        showCart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((ShoppingActivity)getActivity()).showCart();
+            }
+        });
         searchBar = (MaterialSearchBar) getActivity().findViewById(R.id.searchBar);
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("userData", Context.MODE_PRIVATE);
         Set<String> set = sharedPreferences.getStringSet("searchHistory", null);
