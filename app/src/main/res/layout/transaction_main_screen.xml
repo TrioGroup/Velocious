@@ -1,116 +1,146 @@
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".Activities.TransferActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="120dp"
+        android:elevation="8dp"
+        android:background="@color/colorPrimary"
+        android:orientation="vertical"
         android:gravity="center">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginBottom="18dp"
-            android:layout_marginRight="12dp"
-            android:layout_marginTop="18dp"
-            android:text="Balance"
+            android:text="Account Balance"
+            android:textColor="@color/white"
+            android:layout_marginBottom="8dp"
             android:textSize="20sp"></TextView>
 
+    <LinearLayout
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:gravity="center"
+        android:paddingLeft="-20dp">
+
+        <ImageView
+            android:layout_width="40sp"
+            android:layout_height="40sp"
+            android:src="@drawable/rs"
+            android:layout_marginTop="2dp"
+            android:contentDescription=""
+            android:layout_gravity="center"/>
         <TextView
             android:id="@+id/balance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginBottom="18dp"
-            android:layout_marginTop="18dp"
-            android:text="...."
-            android:textSize="20sp"></TextView>
+            android:text="20000"
+            android:textColor="@color/white"
+            android:textSize="36sp"></TextView>
+    </LinearLayout>
+
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/standard_margin"
+        android:gravity="center_vertical"
         android:orientation="vertical"
-        android:gravity="center">
+        android:paddingLeft="24dp">
+
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingBottom="18dp">
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:paddingBottom="10dp">
 
             <ImageButton
                 android:id="@+id/wifi_send"
+                android:src="@drawable/send_flat"
+                android:textAlignment="center"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:background="@android:color/transparent"
-                android:src="@drawable/send_btn_selector"
-                android:textAlignment="center"></ImageButton>
+                android:layout_height="wrap_content">
+            </ImageButton>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="Send"
-                android:textSize="16sp" />
+                android:text="Send Money"
+                android:textSize="18sp"
+                android:layout_marginLeft="24dp"
+                android:layout_gravity="center"/>
 
         </LinearLayout>
+
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="horizontal"
+            android:paddingBottom="10dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp">
 
             <ImageButton
                 android:id="@+id/wifi_receive"
+                android:textAlignment="center"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:background="@android:color/transparent"
-                android:src="@drawable/receive_btn_selector"
-                android:textAlignment="center"></ImageButton>
+                android:src="@drawable/receive_flat"
+                android:layout_height="wrap_content">
+            </ImageButton>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="Receive"
-                android:textSize="16sp" />
-        </LinearLayout>
+                android:text="Receive Money"
+                android:textSize="18sp"
+                android:layout_marginLeft="24dp"
+                android:layout_gravity="center"/>
 
+        </LinearLayout>
         <LinearLayout
+            android:id="@+id/about_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp">
 
             <ImageButton
                 android:id="@+id/btn_history"
+                android:textAlignment="center"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:background="@android:color/transparent"
-                android:src="@drawable/transaction_btn_selector"
-                android:textAlignment="center"></ImageButton>
+                android:src="@drawable/transaction_flat"
+                android:layout_height="wrap_content">
+            </ImageButton>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
                 android:text="History"
-                android:textSize="16sp" />
+                android:textSize="18sp"
+                android:layout_marginLeft="24dp"
+                android:layout_gravity="center"/>
+
         </LinearLayout>
+
     </LinearLayout>
+
 </LinearLayout>

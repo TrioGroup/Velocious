@@ -56,8 +56,6 @@ public class FileClientAsyncTask extends AsyncTask {
             String senderName = EncryptionClass.symmetricDecrypt(sharedPreferences.getString("name", "User"));
             long senderId = Long.parseLong(EncryptionClass.symmetricDecrypt(sharedPreferences.getString("account", "0000")));
 
-            buf = EncryptionClass.symmetricEncrypt(data.trim()+":"+senderId+":"+senderName).getBytes();
-
             transactionData = new TransactionDto();
             transactionData.setSenderID(senderId);
             transactionData.setSenderName(senderName);
@@ -65,6 +63,27 @@ public class FileClientAsyncTask extends AsyncTask {
 
             OutputStream outputStream = socket.getOutputStream();
             InputStream inputStream = socket.getInputStream();
+
+            outputStream.write(EncryptionClass.symmetricEncrypt("passkey").getBytes());
+            Log.e("p2p", "passkey request sent");
+
+
+            buf = null;
+            buf = new byte[2048];
+            inputStream.read(buf);
+            String a= new String(buf);
+            a = EncryptionClass.symmetricDecrypt(a);
+            Log.e("p2p","data received"+a);
+
+            if(activity.passkey == Integer.parseInt(a))
+                Log.e("p2p","Keys matched");
+            else
+             Log.e("p2p","Keys didn't match");
+
+            buf = null;
+            buf = new byte[2048];
+            buf = EncryptionClass.symmetricEncrypt(data.trim() + ":" + senderId + ":" + senderName).getBytes();
+
             outputStream.write(buf);
             Log.e("p2p", "Data sent");
 
@@ -74,7 +93,8 @@ public class FileClientAsyncTask extends AsyncTask {
             String received = new String(buf).trim();
             received = EncryptionClass.symmetricDecrypt(received);
             Log.e("p2p", "Data got back" + received);
-            String[] receivedStrings=received.split(":");
+
+            String[] receivedStrings = received.split(":");
             if (receivedStrings[0].equals("s")) {
                 activity.balance = activity.balance - Double.parseDouble(data);
                 Log.e("p2p", "Current balance" + activity.balance);
@@ -134,8 +154,9 @@ public class FileClientAsyncTask extends AsyncTask {
                 }
             }
             activity.mobiles.clear();
+            activity.mobileNames.clear();
             EventResponse eventResponse = new EventResponse(transactionData, EventNumbers.CLIENT_ASYNC_EVENT);
-            RxBus rxBus=RxBus.getInstance();
+            RxBus rxBus = RxBus.getInstance();
             rxBus.send(eventResponse);
             return 0;
         }

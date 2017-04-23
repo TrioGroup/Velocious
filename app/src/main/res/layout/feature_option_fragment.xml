@@ -1,21 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="@dimen/standard_margin"
-    android:gravity="center_vertical"
     android:orientation="vertical">
 
     <LinearLayout
+        android:id="@+id/balance_layout"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:orientation="horizontal"
+        android:elevation="8dp"
+        android:background="@color/colorPrimary">
+
+        <TextView
+            android:id="@+id/username"
+            android:text="Hello John !"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:textSize="36sp"
+            android:textColor="@android:color/white"
+            android:gravity="center">
+
+        </TextView>
+
+    </LinearLayout>
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/standard_margin"
+    android:gravity="center_vertical"
+    android:orientation="vertical"
+    android:paddingLeft="24dp">
+
+
+    <LinearLayout
+        android:id="@+id/transaction_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="16dp"
+        android:paddingBottom="10dp">
 
         <ImageButton
             android:id="@+id/btn_offline_transaction"
-            android:src="@drawable/tranfer_btn_selector"
+            android:src="@drawable/transfer_flat"
             android:textAlignment="center"
             android:layout_width="wrap_content"
             android:layout_gravity="center"
@@ -27,26 +58,29 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/btn_offline_transaction"
-            android:textSize="16sp"
+            android:textSize="18sp"
+            android:layout_marginLeft="24dp"
             android:layout_gravity="center"/>
 
     </LinearLayout>
 
 
     <LinearLayout
+        android:id="@+id/shopping_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingBottom="18dp">
+        android:orientation="horizontal"
+        android:paddingBottom="10dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp">
 
         <ImageButton
             android:id="@+id/btn_shopping_assist"
             android:textAlignment="center"
             android:layout_width="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="@dimen/standard_margin"
             android:background="@android:color/transparent"
-            android:src="@drawable/shopping_btn_selector"
+            android:src="@drawable/shopping_flat"
             android:layout_height="wrap_content">
         </ImageButton>
 
@@ -54,24 +88,26 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/btn_shopping_assist"
-            android:textSize="16sp"
+            android:textSize="18sp"
+            android:layout_marginLeft="24dp"
             android:layout_gravity="center"/>
 
     </LinearLayout>
     <LinearLayout
+        android:id="@+id/about_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingBottom="18dp">
+        android:orientation="horizontal"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp">
 
         <ImageButton
             android:id="@+id/btn_about"
             android:textAlignment="center"
             android:layout_width="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="@dimen/standard_margin"
             android:background="@android:color/transparent"
-            android:src="@drawable/about_btn_selector"
+            android:src="@drawable/about_flat"
             android:layout_height="wrap_content">
         </ImageButton>
 
@@ -79,9 +115,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="About"
-            android:textSize="16sp"
+            android:textSize="18sp"
+            android:layout_marginLeft="24dp"
             android:layout_gravity="center"/>
 
     </LinearLayout>
+
+</LinearLayout>
 
 </LinearLayout>

@@ -45,6 +45,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 
         if (WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION.equals(action)) {
             // Check to see if Wi-Fi is enabled and notify appropriate activity
+            Log.e("p2p", "Wifi state changed");
         } else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
             Log.e("p2p", "Requesting for peers");
 
@@ -85,7 +86,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             }
             // Respond to new connection or disconnections
         } else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)) {
-            // Respond to this device's wifi state changing
+            Log.e("p2p", "Wifi device state changed");
         }
     }
 

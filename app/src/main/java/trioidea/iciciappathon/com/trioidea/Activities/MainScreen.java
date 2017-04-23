@@ -1,7 +1,9 @@
-package trioidea.iciciappathon.com.trioidea.Activities;
+    package trioidea.iciciappathon.com.trioidea.Activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.AssetManager;
+import android.graphics.Typeface;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -11,7 +13,10 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import java.util.Locale;
 
 import trioidea.iciciappathon.com.trioidea.DbHelper;
 import trioidea.iciciappathon.com.trioidea.Fragments.FeatureOptionFragment;
@@ -31,7 +36,9 @@ public class MainScreen extends AppCompatActivity {
         /*Spannable text = new SpannableString(actionBar.getTitle());
         text.setSpan(new ForegroundColorSpan(), 0, text.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         actionBar.setTitle(text);*/
-        getSupportActionBar().setTitle((Html.fromHtml("<font color=\"#000000\">" + getString(R.string.app_name) + "</font>")));
+        getSupportActionBar().setTitle((Html.fromHtml("<font color=\"#ffffff\">" + getString(R.string.app_name) + "</font>")));
+        getSupportActionBar().setElevation(0);
+
         DbHelper dbHelper = DbHelper.getInstance(this);
         SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("userData", MODE_PRIVATE);
         boolean isRegistered = sharedPreferences.getBoolean("registered", false);

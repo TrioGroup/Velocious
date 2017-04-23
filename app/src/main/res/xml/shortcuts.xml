@@ -1,15 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+
     <shortcut
         android:enabled="true"
-        android:icon="@drawable/shopping"
+        android:icon="@drawable/shopping_flat"
+        android:shortcutDisabledMessage="@string/btn_shopping_assist"
+        android:shortcutId="static2"
+        android:shortcutLongLabel="@string/btn_shopping_assist"
+        android:shortcutShortLabel="@string/btn_shopping_assist">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="trioidea.iciciappathon.com.trioidea.Activities.ShoppingActivity"
+            android:targetPackage="trioidea.iciciappathon.com.trioidea" />
+        <!-- If your shortcut is associated with multiple intents, include them
+             here. The last intent in the list determines what the user sees when
+             they launch this shortcut. -->
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/transfer_flat"
         android:shortcutDisabledMessage="@string/btn_offline_transaction"
-        android:shortcutId="static"
+        android:shortcutId="static1"
         android:shortcutLongLabel="@string/btn_offline_transaction"
         android:shortcutShortLabel="@string/btn_offline_transaction">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetClass="trioidea.iciciappathon.com.trioidea.Activities.MainScreen"
+            android:targetClass="trioidea.iciciappathon.com.trioidea.Activities.TransferActivity"
             android:targetPackage="trioidea.iciciappathon.com.trioidea" />
         <!-- If your shortcut is associated with multiple intents, include them
              here. The last intent in the list determines what the user sees when
@@ -17,4 +35,5 @@
         <categories android:name="android.shortcut.conversation" />
     </shortcut>
     <!-- Specify more shortcuts here. -->
+
 </shortcuts>

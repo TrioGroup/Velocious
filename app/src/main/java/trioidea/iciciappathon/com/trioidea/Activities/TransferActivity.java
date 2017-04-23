@@ -23,7 +23,9 @@ import java.util.List;
 
 import trioidea.iciciappathon.com.trioidea.DbHelper;
 import trioidea.iciciappathon.com.trioidea.EncryptionClass;
+import trioidea.iciciappathon.com.trioidea.Fragments.FeatureOptionFragment;
 import trioidea.iciciappathon.com.trioidea.Fragments.HistoryFragment;
+import trioidea.iciciappathon.com.trioidea.Fragments.RegistrationFragment;
 import trioidea.iciciappathon.com.trioidea.Fragments.SendMoneyFragment;
 import trioidea.iciciappathon.com.trioidea.Fragments.TransactionMainScreenFragment;
 import trioidea.iciciappathon.com.trioidea.R;
@@ -44,6 +46,7 @@ public class TransferActivity extends AppCompatActivity {
     public boolean isSender = false;
     public InetAddress address;
     public double balance;
+    public int passkey;
     public TransactionMainScreenFragment transactionMainScreenFragment;
 
     @Override
@@ -51,10 +54,14 @@ public class TransferActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        getSupportActionBar().setTitle((Html.fromHtml("<font color=\"#000000\">" + getString(R.string.app_name) + "</font>")));
+        getSupportActionBar().setTitle((Html.fromHtml("<font color=\"#ffffff\">" + getString(R.string.app_name) + "</font>")));
+        getSupportActionBar().setElevation(0);
 
        // SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("userData", MODE_PRIVATE);
         //String balanceEncrypted = sharedPreferences.getString("balance", "00");
+
+        DbHelper dbHelper1 = DbHelper.getInstance(this);
+        if(dbHelper1 != null)
         balance = DbHelper.getInstance(this).getBalance();
         //balance= Double.parseDouble(EncryptionClass.symmetricDecrypt(balanceEncrypted));
         //textView = (TextView) findViewById(R.id.balance);
@@ -145,6 +152,9 @@ public class TransferActivity extends AppCompatActivity {
     }
 
     public void startTransactionScreenFragment() {
+        mobiles.clear();
+        mobileNames.clear();
+        adapter.notifyDataSetChanged();
         transactionMainScreenFragment = new TransactionMainScreenFragment();
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -230,6 +240,30 @@ public class TransferActivity extends AppCompatActivity {
         } catch (IllegalAccessException e) {
             Log.e("WIFI", "Could not delete persistent group", e);
         }
+    }
+
+    public void startTransferFragment() {
+        replaceFragment(new TransactionMainScreenFragment(), true);
+    }
+
+    public void startRegisterFragment() {
+        addFragment(new RegistrationFragment(), false);
+    }
+
+    public void replaceFragment(android.app.Fragment fragment, boolean addToBackStack) {
+        android.app.FragmentManager fragmentManager = getFragmentManager();
+        android.app.FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.main_fragment, fragment);
+        fragmentTransaction.commit();
+    }
+
+    public void addFragment(android.app.Fragment fragment,boolean addToBackStack) {
+        android.app.FragmentManager fragmentManager = getFragmentManager();
+        android.app.FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.add(R.id.main_fragment, fragment);
+        if (addToBackStack)
+            fragmentTransaction.addToBackStack(fragment.getClass().getName());
+        fragmentTransaction.commit();
     }
 
 }

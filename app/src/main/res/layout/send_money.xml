@@ -1,40 +1,50 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:orientation="vertical"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".Activities.TransferActivity">
+    android:layout_height="match_parent"
+    tools:context=".Activities.TransferActivity">
 
     <LinearLayout
-        android:id="@+id/container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="120dp"
+        android:elevation="8dp"
+        android:background="@color/colorPrimary"
+        android:orientation="vertical"
         android:gravity="center">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Account Balance"
+            android:textColor="@color/white"
+            android:layout_marginBottom="8dp"
+            android:textSize="20sp"></TextView>
 
-    <TextView
-          android:text="Balance"
-          android:layout_gravity="center"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:textSize="20sp"
-          android:layout_marginTop="18dp"
-          android:layout_marginRight="12dp"
-          android:layout_marginBottom="18dp">
-      </TextView>
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:paddingLeft="-20dp">
 
-      <TextView
-          android:id="@+id/balance"
-          android:text="...."
-          android:textSize="20sp"
-          android:layout_gravity="center"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_marginTop="18dp"
-          android:layout_marginBottom="18dp">
-      </TextView>
-  </LinearLayout>
+            <ImageView
+                android:layout_width="40sp"
+                android:layout_height="40sp"
+                android:src="@drawable/rs"
+                android:layout_marginTop="2dp"
+                android:contentDescription=""
+                android:layout_gravity="center"/>
+            <TextView
+                android:id="@+id/balance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="20000"
+                android:textColor="@color/white"
+                android:textSize="36sp"></TextView>
+        </LinearLayout>
+
+    </LinearLayout>
 
 
   <LinearLayout
@@ -48,19 +58,21 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:paddingBottom="18dp"
-      android:orientation="vertical"
+      android:layout_marginTop="24dp"
+      android:orientation="horizontal"
       android:gravity="center">
 
-      <TextView
-          android:text="Enter Amount"
+      <ImageView
           android:layout_width="wrap_content"
-          android:layout_height="wrap_content">
-      </TextView>
+          android:layout_marginLeft="-18dp"
+          android:layout_height="40dp"
+          android:src="@drawable/rupee"/>
       <EditText
           android:id="@+id/amount"
           android:inputType="numberDecimal"
-          android:layout_width="50dp"
+          android:layout_width="95dp"
           android:layout_height="wrap_content"
+          android:layout_marginLeft="2dp"
           android:maxLength="8">
       </EditText>
   </LinearLayout>
@@ -69,6 +81,9 @@
   <TextView
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
+      android:layout_marginLeft="16dp"
+      android:layout_marginTop="20dp"
+      android:textColor="@color/colorAccent"
       android:text="@string/available_devices"/>
 
     <android:android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
@@ -78,7 +93,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="12dp"
-        android:layout_margin="10dp"
+        android:layout_margin="16dp"
         android:layout_marginRight="10dp"
         android:text="@android:color/black"
         card_view:cardCornerRadius="2dp"

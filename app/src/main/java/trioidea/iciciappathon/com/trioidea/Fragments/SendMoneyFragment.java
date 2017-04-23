@@ -20,6 +20,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Random;
+
 import rx.Observer;
 import rx.Subscription;
 import trioidea.iciciappathon.com.trioidea.Activities.TransferActivity;
@@ -36,32 +38,30 @@ import trioidea.iciciappathon.com.trioidea.Services.WiFiDirectBroadcastReceiver;
 /**
  * Created by Harshal on 12-Apr-17.
  */
-public class SendMoneyFragment extends Fragment implements Observer
-{
+public class SendMoneyFragment extends Fragment implements Observer {
 
     ProgressDialog progressDialog;
     TransferActivity parentActivity;
-    RxBus rxBus=RxBus.getInstance();
+    RxBus rxBus = RxBus.getInstance();
     Subscription subscription;
 
     @Override
-    public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle savedInstanceState)
-    {
-        return layoutInflater.inflate(R.layout.send_money,viewGroup,false);
+    public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle savedInstanceState) {
+        return layoutInflater.inflate(R.layout.send_money, viewGroup, false);
 
     }
 
     public void initUi()
 
     {
-        parentActivity=(TransferActivity)SendMoneyFragment.this.getActivity();
+        parentActivity = (TransferActivity) SendMoneyFragment.this.getActivity();
 
 
         parentActivity.textView = (TextView) parentActivity.findViewById(R.id.balance);
         parentActivity.textView.setText(String.valueOf(DbHelper.getInstance(getActivity()).getBalance()));
 
         parentActivity.adapter = new ArrayAdapter(parentActivity, R.layout.activity_listview, parentActivity.mobileNames);
-        parentActivity.listView= (ListView) parentActivity.findViewById(R.id.mobile_list);
+        parentActivity.listView = (ListView) parentActivity.findViewById(R.id.mobile_list);
         parentActivity.listView.setAdapter(parentActivity.adapter);
 
         parentActivity.amount = (EditText) parentActivity.findViewById(R.id.amount);
@@ -70,17 +70,21 @@ public class SendMoneyFragment extends Fragment implements Observer
         parentActivity.listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                progressDialog=new ProgressDialog(parentActivity);
+                progressDialog = new ProgressDialog(parentActivity);
                 progressDialog.setMessage("Sending money");
                 progressDialog.setProgress(0);
                 progressDialog.setCancelable(false);
                 progressDialog.show();
                 parentActivity.mWifiP2pManager.cancelConnect(parentActivity.mChannel, new WifiP2pManager.ActionListener() {
                     @Override
-                    public void onSuccess() { Log.e("p2p","searching cancelled"); }
+                    public void onSuccess() {
+                        Log.e("p2p", "searching cancelled");
+                    }
 
                     @Override
-                    public void onFailure(int reason) { Log.e("p2p","searching cancelled"); }
+                    public void onFailure(int reason) {
+                        Log.e("p2p", "searching cancelled");
+                    }
                 });
                 final String item = ((TextView) view).getText().toString();
 //                Toast.makeText(getActivity().getApplicationContext(), item, Toast.LENGTH_LONG).show();
@@ -89,17 +93,19 @@ public class SendMoneyFragment extends Fragment implements Observer
                 config.deviceAddress = (String) parentActivity.mobiles.get(index);
                 config.wps.setup = WpsInfo.PBC;
                 config.groupOwnerIntent = 0;
-                Log.e("p2p","TextView value: "+parentActivity.amount.getText());
-                if(parentActivity.amount.getText() == null)
+                Log.e("p2p", "TextView value: " + parentActivity.amount.getText());
+                if (parentActivity.amount.getText() == null)
                     Toast.makeText(getActivity().getApplicationContext(), "Please enter amount", Toast.LENGTH_LONG).show();
-                else
-                {
-                    parentActivity.mWifiP2pManager.connect(parentActivity.mChannel, config, new WifiP2pManager.ActionListener()
-                    {
+                else {
+                    parentActivity.mWifiP2pManager.connect(parentActivity.mChannel, config, new WifiP2pManager.ActionListener() {
                         @Override
                         public void onSuccess() {
                             Log.e("p2p", "connected to device");
-                           // new FileClientAsyncTask(getActivity().getApplicationContext(), parentActivity.address, parentActivity.amount.getText().toString(), parentActivity).execute();
+                             parentActivity.passkey = new Random().nextInt(8999)+1000;
+                            progressDialog.setMessage("Passkey : "+parentActivity.passkey);
+                            Log.e("p2p","passkey displayed");
+                        //    -----------------------
+                            // new FileClientAsyncTask(getActivity().getApplicationContext(), parentActivity.address, parentActivity.amount.getText().toString(), parentActivity).execute();
                         }
 
                         @Override
@@ -117,13 +123,12 @@ public class SendMoneyFragment extends Fragment implements Observer
 
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
         initUi();
         parentActivity.mReceiver = new WiFiDirectBroadcastReceiver(parentActivity.mWifiP2pManager, parentActivity.mChannel, parentActivity);
         parentActivity.registerReceiver(parentActivity.mReceiver, parentActivity.mIntentFilter);
-        subscription=rxBus.toObserverable().subscribe(SendMoneyFragment.this);
+        subscription = rxBus.toObserverable().subscribe(SendMoneyFragment.this);
 
     }
 
@@ -132,9 +137,9 @@ public class SendMoneyFragment extends Fragment implements Observer
         super.onPause();
         parentActivity.unregisterReceiver(parentActivity.mReceiver);
     }
+
     @Override
-    public void onDestroy()
-    {
+    public void onDestroy() {
         super.onDestroy();
         this.subscription.unsubscribe();
     }
@@ -157,19 +162,20 @@ public class SendMoneyFragment extends Fragment implements Observer
                 parentActivity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        progressDialog.dismiss();
+                        if(progressDialog != null)
+                            progressDialog.dismiss();
                         parentActivity.textView.setText(String.valueOf(parentActivity.balance));
                     }
                 });
 
                 // Adding data in database
                 DbHelper db = DbHelper.getInstance(this.getActivity());
-                TransactionDto transactionData = (TransactionDto)((EventResponse) o).getResponse();
-                           db.insertTransaction(transactionData);
-                TransactionDto[] transactionDtos=db.getAllTransaction();
-                Log.e("p2p","Entry Made");
-                for(int i=0;i<transactionDtos.length;i++)
-                Log.e("sender done","length:"+transactionDtos.length+" first:"+transactionDtos[i].getAmount());
+                TransactionDto transactionData = (TransactionDto) ((EventResponse) o).getResponse();
+                db.insertTransaction(transactionData);
+                TransactionDto[] transactionDtos = db.getAllTransaction();
+                Log.e("p2p", "Entry Made");
+                for (int i = 0; i < transactionDtos.length; i++)
+                    Log.e("sender done", "length:" + transactionDtos.length + " first:" + transactionDtos[i].getAmount());
                 getActivity().getFragmentManager().popBackStack();
         }
     }

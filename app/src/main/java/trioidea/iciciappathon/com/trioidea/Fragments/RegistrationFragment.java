@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,8 +31,8 @@ import android.support.design.widget.TextInputLayout;
  */
 public class RegistrationFragment extends Fragment {
 
-    EditText etName, etAddress, etPhoneNumber, etAadhar, etCard;
-    TextInputLayout tilName, tilAddress, tilPhoneNumber, tilAadhar, tilCard;
+    EditText etName, etAddress, etPhoneNumber, etAadhar, etCard, etPin;
+    TextInputLayout tilName, tilAddress, tilPhoneNumber, tilAadhar, tilCard, tilPin;
     ImageButton register;
     double balance;
     AllUsersInfoDTO allUsersInfoDTO;
@@ -52,7 +53,8 @@ public class RegistrationFragment extends Fragment {
         super.onResume();
         registrationFragmentController = new RegistrationFragmentController(this);
         init();
-        ((MainScreen)getActivity()).changeTitle("Register");
+//        ((MainScreen)getActivity()).changeTitle("Register");
+        ((MainScreen)getActivity()).getSupportActionBar().setTitle((Html.fromHtml("<font color=\"#ffffff\">" + "Register" + "</font>")));
         resetUi();
     }
     @Override
@@ -67,6 +69,7 @@ public class RegistrationFragment extends Fragment {
         etPhoneNumber = (EditText) RegistrationFragment.this.getActivity().findViewById(R.id.et_phone);
         etAadhar = (EditText) RegistrationFragment.this.getActivity().findViewById(R.id.et_account_number);
         etCard = (EditText) RegistrationFragment.this.getActivity().findViewById(R.id.et_card);
+        etPin = (EditText) RegistrationFragment.this.getActivity().findViewById(R.id.et_pin);
         register = (ImageButton) RegistrationFragment.this.getActivity().findViewById(R.id.btn_register);
         register.setOnClickListener(registrationFragmentController);
         tilName = (TextInputLayout) RegistrationFragment.this.getActivity().findViewById(R.id.til_name);
@@ -74,11 +77,13 @@ public class RegistrationFragment extends Fragment {
         tilPhoneNumber = (TextInputLayout) RegistrationFragment.this.getActivity().findViewById(R.id.til_phone);
         tilAadhar = (TextInputLayout) RegistrationFragment.this.getActivity().findViewById(R.id.til_aadhar);
         tilCard = (TextInputLayout) RegistrationFragment.this.getActivity().findViewById(R.id.til_card);
+        tilPin= (TextInputLayout) RegistrationFragment.this.getActivity().findViewById(R.id.til_pin);
         addTextWatcher(tilName);
         addTextWatcher(tilAddress);
         addTextWatcher(tilPhoneNumber);
         addTextWatcher(tilAadhar);
         addTextWatcher(tilCard);
+        addTextWatcher(tilPin);
 
     }
 
@@ -126,6 +131,18 @@ public class RegistrationFragment extends Fragment {
             tilCard.setErrorEnabled(true);
             flag=false;
         }
+        if(etCard.getText().toString().isEmpty())
+        {
+            tilCard.setError("Pin Number is a required field.");
+            tilCard.setErrorEnabled(true);
+            flag=false;
+        }
+        else if(etCard.getText().length()<4)
+        {
+            tilCard.setError("Pin Number is invalid.");
+            tilCard.setErrorEnabled(true);
+            flag=false;
+        }
         return flag;
     }
 
@@ -136,6 +153,7 @@ public class RegistrationFragment extends Fragment {
         tilAddress.setErrorEnabled(false);
         tilAadhar.setErrorEnabled(false);
         tilCard.setErrorEnabled(false);
+        tilPin.setErrorEnabled(false);
     }
     public void setDataInSharedPref(BankAccountSummaryDTO bankAccountSummaryDTO)
     {
@@ -145,6 +163,7 @@ public class RegistrationFragment extends Fragment {
         editor.putString("phone",EncryptionClass.symmetricEncrypt(etPhoneNumber.getText().toString()));
         editor.putString("account",EncryptionClass.symmetricEncrypt(etAadhar.getText().toString()));
         editor.putString("card",EncryptionClass.symmetricEncrypt(etCard.getText().toString()));
+        editor.putString("pin",EncryptionClass.symmetricEncrypt(etPin.getText().toString()));
         editor.putBoolean("registered",true);
         editor.putString("cust_id",EncryptionClass.symmetricEncrypt(String.valueOf(bankAccountSummaryDTO.getCustid())));
         TransactionDto transactionDto=new TransactionDto(0,0,"Bank",Long.parseLong(etAadhar.getText().toString()),etName.getText().toString(),0, String.valueOf(System.currentTimeMillis()),bankAccountSummaryDTO.getBalance(),true);
