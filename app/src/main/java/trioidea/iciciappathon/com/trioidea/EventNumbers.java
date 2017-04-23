@@ -19,6 +19,8 @@ public class EventNumbers {
     public static final int CHECK_TRANSACTION_EVENT=13;
     public static final int AMAZON_GET_PRODUCTS=14;
     public static final int AMAZON_GET_ITEM=15;
+    public static final int FLIPKART_GET_ITEM=16;
+
 
     //FRAGMENT EVENTS
     public static final int START_ITEM_DETAILS_FRAGMENT=100;

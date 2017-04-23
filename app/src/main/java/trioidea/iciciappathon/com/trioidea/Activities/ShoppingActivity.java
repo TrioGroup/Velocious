@@ -15,6 +15,7 @@ import rx.Observer;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+import trioidea.iciciappathon.com.trioidea.DTO.ItemListDTO;
 import trioidea.iciciappathon.com.trioidea.DTO.SingleItem;
 import trioidea.iciciappathon.com.trioidea.EventNumbers;
 import trioidea.iciciappathon.com.trioidea.EventResponse;
@@ -29,7 +30,7 @@ import trioidea.iciciappathon.com.trioidea.RxBus;
 public class ShoppingActivity extends AppCompatActivity implements Observer {
     ProgressDialog progressDialog;
     AlertDialog alertDialog;
-    private SingleItem selectedItem;
+    private ItemListDTO selectedItem;
     Subscription subscription;
     RxBus rxBus=RxBus.getInstance();
 
@@ -40,6 +41,7 @@ public class ShoppingActivity extends AppCompatActivity implements Observer {
         //getSupportActionBar().setTitle((Html.fromHtml("<font color=\"#000000\">" + getString(R.string.app_name) + "</font>")));
         subscription=rxBus.toObserverable().observeOn(Schedulers.io()).subscribeOn(AndroidSchedulers.mainThread()).subscribe(this);
     }
+
 
     @Override
     public void onResume() {
@@ -101,11 +103,11 @@ public class ShoppingActivity extends AppCompatActivity implements Observer {
 
     }
 
-    public SingleItem getSelectedItem() {
+    public ItemListDTO getSelectedItem() {
         return selectedItem;
     }
 
-    public void setSelectedItem(SingleItem selectedItem) {
+    public void setSelectedItem(ItemListDTO selectedItem) {
         this.selectedItem = selectedItem;
     }
 

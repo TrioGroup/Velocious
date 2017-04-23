@@ -27,6 +27,7 @@ import trioidea.iciciappathon.com.trioidea.DTO.AuthenticateDto;
 import trioidea.iciciappathon.com.trioidea.DTO.BalanceEnquiryDTO;
 import trioidea.iciciappathon.com.trioidea.DTO.BankAccountSummaryDTO;
 import trioidea.iciciappathon.com.trioidea.DTO.CheckTransactionDTO;
+import trioidea.iciciappathon.com.trioidea.DTO.FlipkartProductInfoList;
 import trioidea.iciciappathon.com.trioidea.DTO.FundTransferDto;
 import trioidea.iciciappathon.com.trioidea.DTO.HistoryDateRangeDTO;
 import trioidea.iciciappathon.com.trioidea.DTO.ItemLookUpDto;
@@ -232,6 +233,23 @@ public class ServiceLayer implements Observer {
             }
         }).subscribe(ServiceLayer.this);
     }
+    public void getItemsFromFlipkart(final String searchItem) {
+        final Observable observable = Observable.fromCallable(new Callable() {
+            @Override
+            public Object call() throws Exception {
+                String query=searchItem.replace(" ","+");
+                GetFlipkartProducts getFlipkartProducts=new GetFlipkartProducts();
+                EventResponse eventResponse = getFlipkartProducts.getProducts(query);
+                return eventResponse;
+            }
+        });
+        observable.subscribeOn(Schedulers.io()).observeOn(Schedulers.computation()).doOnCompleted(new Action0() {
+            @Override
+            public void call() {
+                observable.unsubscribeOn(Schedulers.io());
+            }
+        }).subscribe(ServiceLayer.this);
+    }
 
     @Override
     public void onCompleted() {
@@ -307,6 +325,12 @@ public class ServiceLayer implements Observer {
                     ItemLookUpDto singleItem = (ItemLookUpDto) ((EventResponse) o).getResponse();
                     Log.e("Event get Products", "" + singleItem.getASIN());
                     ((EventResponse) o).setEvent(EventNumbers.AMAZON_GET_ITEM);
+                    rxBus.send((EventResponse) o);
+                    break;
+                case EventNumbers.FLIPKART_GET_ITEM:
+                    List<FlipkartProductInfoList> flipkartProductInfoList = (List<FlipkartProductInfoList>) ((EventResponse) o).getResponse();
+                    Log.e("Event get Products", "" + flipkartProductInfoList.get(0).getProductBaseInfoV1().getProductId());
+                    ((EventResponse) o).setEvent(EventNumbers.FLIPKART_GET_ITEM);
                     rxBus.send((EventResponse) o);
                     break;
             }

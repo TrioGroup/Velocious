@@ -1,53 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_margin="8dp"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp">
 
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="8dp"
         android:layout_gravity="center"
+        android:layout_margin="8dp"
         android:background="@color/colorAccent"
         android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/site_logo"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:translationX="1dp"/>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingLeft="12dp"
-            android:padding="8dp">
+            android:padding="8dp"
+            android:paddingLeft="12dp">
+
             <ImageView
                 android:id="@+id/imageView"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:layout_gravity="center"/>
+                android:layout_gravity="center" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:paddingLeft="20dp"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:paddingLeft="20dp">
 
                 <TextView
                     android:id="@+id/textViewName"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
 
 
                 <TextView
                     android:id="@+id/textViewDesc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:singleLine="true"
-                    android:text="New Text" />
+                    android:singleLine="true" />
 
-                <TextView
-                    android:id="@+id/textViewsite"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>>
-            </LinearLayout></LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/textViewsite"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
+                    <TextView
+                        android:id="@+id/textViewOffer"
+                        android:layout_width="match_parent"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
     </android.support.v7.widget.CardView>
 </LinearLayout>
