@@ -18,22 +18,33 @@ import android.widget.LinearLayout;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
+import trioidea.iciciappathon.com.trioidea.DTO.ItemListDTO;
 import trioidea.iciciappathon.com.trioidea.DTO.ItemLookUpDto;
 import trioidea.iciciappathon.com.trioidea.DTO.SingleItem;
 import trioidea.iciciappathon.com.trioidea.R;
+import trioidea.iciciappathon.com.trioidea.Services.ItemLookUp;
 
 public class ImageAdapter extends PagerAdapter {
     Activity activity;
     ItemLookUpDto singleItem;
+    ItemListDTO itemListDTO;
+    boolean isAmazon;
 
-    public ImageAdapter(Activity activity, ItemLookUpDto singleItem) {
+    public ImageAdapter(Activity activity, Object singleItem, boolean flag) {
         this.activity = activity;
-        this.singleItem = singleItem;
+        if (flag)
+            this.singleItem = (ItemLookUpDto) singleItem;
+        else
+            this.itemListDTO = (ItemListDTO) singleItem;
+        this.isAmazon = flag;
     }
 
     @Override
     public int getCount() {
-        return singleItem.getImageSets().getImageSet().size();
+        if (isAmazon)
+            return singleItem.getImageSets().getImageSet().size();
+        else
+            return 1;
     }
 
     @Override
@@ -54,7 +65,12 @@ public class ImageAdapter extends PagerAdapter {
                 imageView.startAnimation(animLoad);
             }
         });*/
-        Picasso.with(activity).load(singleItem.getImageSets().getImageSet().get(position).getLargeImage().getURL()).placeholder(R.drawable.loading_image).into(new Target() {
+        String imageUrl;
+        if (isAmazon)
+            imageUrl = singleItem.getImageSets().getImageSet().get(position).getLargeImage().getURL();
+        else
+            imageUrl = itemListDTO.getImageUrl();
+        Picasso.with(activity).load(imageUrl).placeholder(R.drawable.loading_image).into(new Target() {
             @Override
             public void onBitmapLoaded(final Bitmap bitmap, final Picasso.LoadedFrom from) {
                 activity.runOnUiThread(new Runnable() {
@@ -82,6 +98,7 @@ public class ImageAdapter extends PagerAdapter {
             }
 
         });
+
         ((ViewPager) container).addView(imageView, position);
         return imageView;
     }

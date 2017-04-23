@@ -7,6 +7,15 @@ public class ItemLookUpDto {
     String ASIN;
     ImageSetsDTO ImageSets;
     AttributeOfItemLookUp ItemAttributes;
+    OffersDto Offers;
+
+    public OffersDto getOfferSummary() {
+        return Offers;
+    }
+
+    public void setOfferSummary(OffersDto offerSummary) {
+        Offers = offerSummary;
+    }
 
     public ImageSetsDTO getImageSets() {
         return ImageSets;

@@ -1,12 +1,23 @@
 package trioidea.iciciappathon.com.trioidea.DTO;
 
+import java.io.Serializable;
+
 /**
  * Created by asus on 19/04/2017.
  */
-public class SingleItem {
+public class SingleItem implements Serializable {
     String ASIN;
     ImageDto MediumImage;
     AttributeClass ItemAttributes;
+    OffersDto Offers;
+
+    public OffersDto getOfferSummary() {
+        return Offers;
+    }
+
+    public void setOfferSummary(OffersDto offerSummary) {
+        Offers = offerSummary;
+    }
 
     public ImageDto getMediumImage() {
         return MediumImage;

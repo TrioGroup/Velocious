@@ -57,6 +57,52 @@ public class WebService {
             }
         }
     }
+
+    public static String getFlipkartJSON(String url) {
+        HttpURLConnection c = null;
+        try {
+
+            Log.d("API", url);
+            URL u = new URL(url);
+            c = (HttpURLConnection) u.openConnection();
+            c.setRequestMethod("GET");
+            c.setRequestProperty("Content-length", "0");
+            c.setUseCaches(false);
+            c.addRequestProperty("Fk-Affiliate-Id","sandeshba1");
+            c.addRequestProperty("Fk-Affiliate-Token","a4a490d9ad4e4d479c44a0aa9d23ea37");
+            c.setAllowUserInteraction(false);
+            c.setConnectTimeout(5000);
+            c.setReadTimeout(5000);
+            c.connect();
+            int status = c.getResponseCode();
+
+            /*switch (status) {
+                case 200:
+                case 201:*/
+            BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+            }
+            br.close();
+            return sb.toString().replaceAll(" ", "");//.replace("[","").replace("]","");
+
+
+        } catch (MalformedURLException ex) {
+            return null;
+        } catch (IOException ex) {
+            return null;
+        } finally {
+            if (c != null) {
+                try {
+                    c.disconnect();
+                } catch (Exception ex) {
+
+                }
+            }
+        }
+    }
     public static String getXML(String url) {
         String line = null;
 
